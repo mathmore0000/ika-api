@@ -20,5 +20,5 @@ Route.get("/", () => {
   return { greeting: "Hello world in JSON" };
 });
 
-Route.post("/users", "UserController.create");
-Route.post("/sessions", "SessionController.create");
+Route.post("/user/create", "UserController.create");
+Route.post("/user/login", "SessionController.create");
