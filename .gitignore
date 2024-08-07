@@ -1,11 +1,33 @@
-# Node modules
-node_modules
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-# Adonis directory for storing tmp files
-tmp
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
 
-# Environment variables, never commit this file
-.env
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
 
-# The development sqlite file
-database/*.sqlite
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
