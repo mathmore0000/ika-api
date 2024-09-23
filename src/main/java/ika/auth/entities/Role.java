@@ -13,8 +13,8 @@ import java.util.List;
 public class Role {
 
     @Id
-    @Column(name = "name", nullable = false, unique = true)
-    private String name;
+    @Column(name = "role", nullable = false, unique = true)
+    private String role;
 
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     private List<User> users;

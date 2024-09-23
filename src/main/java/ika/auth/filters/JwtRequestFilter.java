@@ -32,16 +32,7 @@ public class JwtRequestFilter extends OncePerRequestFilter implements Applicatio
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-
-        if (userService == null) {
-            userService = context.getBean(UserService.class);
-        }
-        if (jwtUtil == null) {
-            jwtUtil = context.getBean(JwtUtil.class);
-        }
-
         final String authorizationHeader = request.getHeader("Authorization");
-
         String email = null;
         String jwt = null;
 
@@ -51,7 +42,7 @@ public class JwtRequestFilter extends OncePerRequestFilter implements Applicatio
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userService.loadUserByUsername(email);
+            UserDetails userDetails = userService.loadUserByUsername(email);
 
             if (jwtUtil.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -61,6 +52,7 @@ public class JwtRequestFilter extends OncePerRequestFilter implements Applicatio
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
+
         chain.doFilter(request, response);
     }
 }

@@ -34,7 +34,8 @@ public class User {
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
-    
+
+    @Transient
     private String password;
 
     @ManyToOne(fetch = FetchType.EAGER)
