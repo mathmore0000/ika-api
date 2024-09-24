@@ -27,21 +27,14 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    public boolean verifyPassword(String rawPassword, String encodedPassword) {
-        // Verifica se a senha fornecida corresponde ao hash
-        return passwordEncoder.matches(rawPassword, encodedPassword);
-    }
-
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        System.out.println("Pegando user pelo e-mail " + email);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
-        System.out.println("User recuperado " + user);
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail()) // Autenticar pelo e-mail
                 .password(user.getPasswordHash()) // Usar passwordHash
-//                .authorities(user.getRole().getRole()) // Pegar o nome do papel (Role)
+                .authorities(user.getRole().getRole()) // Pegar o nome do papel (Role)
                 .build();
     }
 

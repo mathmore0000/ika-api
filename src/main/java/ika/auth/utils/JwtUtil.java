@@ -18,11 +18,32 @@ import java.util.Map;
 public class JwtUtil {
 
     // Carregar as chaves do .env
-    @Value("${JWT_SECRET_GENERATE}")
-    private String secretKeyGenerate; // Chave usada para gerar o token
+    @Value("${JWT_SECRET_KEY}")
+    private String secretKey; // Chave usada para validar o token
 
-    @Value("${JWT_SECRET_VALIDATE}")
-    private String secretKeyValidate; // Chave usada para validar o token
+    public String generateRefreshToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7)) // Expira em 7 dias
+                .signWith(getSigningKey(secretKey), SignatureAlgorithm.HS256) // Usa a chave de geração
+                .compact();
+    }
+
+    // Método para validar o refresh token
+    public boolean validateRefreshToken(String refreshToken) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey(secretKey)) // Usa a chave de validação
+                    .build()
+                    .parseClaimsJws(refreshToken);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     // Método para converter string em chave HMAC
     private Key getSigningKey(String secretKey) {
@@ -44,14 +65,14 @@ public class JwtUtil {
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // Token válido por 10 horas
-                .signWith(getSigningKey(secretKeyGenerate), SignatureAlgorithm.HS256) // Assina o token com a chave de geração
+                .signWith(getSigningKey(secretKey), SignatureAlgorithm.HS256) // Assina o token com a chave de geração
                 .compact();
     }
 
     // Extrai as claims do token
     public Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey(secretKeyValidate)) // Usa a chave de validação
+                .setSigningKey(getSigningKey(secretKey)) // Usa a chave de validação
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

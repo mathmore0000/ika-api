@@ -1,5 +1,9 @@
 package ika.auth.controllers;
 
+import ika.auth.controllers.classes.AuthRequest;
+import ika.auth.controllers.classes.RefreshTokenRequest;
+import ika.auth.controllers.classes.SignUpRequest;
+import ika.auth.controllers.classes.TokenResponse;
 import ika.auth.entities.Role;
 import ika.auth.entities.User;
 import ika.auth.services.RoleService;
@@ -18,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/v1/auth")
 public class AuthController {
 
     @Autowired
@@ -33,55 +37,65 @@ public class AuthController {
     @Autowired
     private RoleService roleService;
 
+    @PostMapping("/refresh-token")
+    public ResponseEntity<TokenResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+        String refreshToken = refreshTokenRequest.getRefreshToken();
+
+        if (!jwtUtil.validateRefreshToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        String username = jwtUtil.extractUsername(refreshToken);
+        UserDetails userDetails = userService.loadUserByUsername(username);
+
+        String newJwt = jwtUtil.generateToken(userDetails);
+        String newRefreshToken = jwtUtil.generateRefreshToken(userDetails);
+
+        TokenResponse tokenResponse = new TokenResponse(newJwt, newRefreshToken);
+        return ResponseEntity.ok(tokenResponse);
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody AuthRequest authRequest) throws Exception {
-        System.out.println("Login request received");
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody AuthRequest authRequest) throws Exception {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
             );
         } catch (BadCredentialsException e) {
-            System.out.println("Invalid username or password");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
-        }
-        catch (Exception e){
-            System.out.print("erro genérico" + e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 
-        System.out.println("Username and password correct");
         final UserDetails userDetails = userService.loadUserByUsername(authRequest.getUsername());
         final String jwt = jwtUtil.generateToken(userDetails);
+        final String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
-        return ResponseEntity.ok(jwt);
+        TokenResponse tokenResponse = new TokenResponse(jwt, refreshToken);
+        return ResponseEntity.ok(tokenResponse);
     }
 
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
-        System.out.println("sign up" + signUpRequest);
         // Verifique se o e-mail ou telefone já existe no banco de dados
         if (userService.emailExists(signUpRequest.getEmail())) {
-            System.out.println("e-mail em uso");
             return ResponseEntity.badRequest().body("Email already in use");
         }
 
-        Role userRole = roleService.findRoleByName(Role.USER)
+        Role defaultRole = roleService.findRoleByName(Role.USER)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
-        System.out.println("role found");
         // Crie e salve o novo usuário
         User newUser = User.builder()
                 .displayName(signUpRequest.getDisplayName())
                 .email(signUpRequest.getEmail())
                 .password(signUpRequest.getPassword()) // Note que estamos salvando o hash da senha
                 .locale(signUpRequest.getLocale())
-                .role(userRole)
+                .role(defaultRole)
                 .metadata("")
                 .createdAt(LocalDateTime.now())
                 .build();
-        System.out.println("user built");
 
         userService.createUser(newUser);
-        System.out.println("user created");
 
         return ResponseEntity.ok("User registered successfully");
     }

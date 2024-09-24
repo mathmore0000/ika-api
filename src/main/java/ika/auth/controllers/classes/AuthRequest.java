@@ -1,7 +1,11 @@
-package ika.auth.controllers;
+package ika.auth.controllers.classes;
+
+import jakarta.validation.constraints.NotNull;
 
 public class AuthRequest {
+    @NotNull(message = "Username is required")
     private String username;
+    @NotNull(message = "Password is required")
     private String password;
 
     // Construtor padrão
