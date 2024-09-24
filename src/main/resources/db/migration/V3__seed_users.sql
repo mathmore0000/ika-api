@@ -1,0 +1,1 @@
+insert into auth.users (display_name, email, locale, password_hash, created_at, disabled) values ('mathmore0000', 'matheusmoreira2004@live.com', 'pt', '$2a$10$NLaxDvC6BEcYmrFoWwvIKuLhcuPIK6b8S3InnZn1H/kiesQX0A2Lq', now(), false)

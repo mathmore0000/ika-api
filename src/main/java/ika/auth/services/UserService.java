@@ -33,13 +33,19 @@ public class UserService implements UserDetailsService {
     }
 
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        System.out.println("Pegando user pelo e-mail " + email);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
+        System.out.println("User recuperado " + user);
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail()) // Autenticar pelo e-mail
                 .password(user.getPasswordHash()) // Usar passwordHash
-                .authorities(user.getRole().getRole()) // Pegar o nome do papel (Role)
+//                .authorities(user.getRole().getRole()) // Pegar o nome do papel (Role)
                 .build();
+    }
+
+    public Boolean emailExists(String email)  {
+        return userRepository.existsByEmail(email);
     }
 }

@@ -26,7 +26,7 @@ public class User {
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-    @Column(name = "locale")
+    @Column(name = "locale", nullable = false)
     private String locale;
 
     @Column(name = "phone_number", unique = true)
@@ -43,7 +43,7 @@ public class User {
     private Role role;
 
     @Column(name = "disabled", nullable = false)
-    private boolean disabled;
+    private boolean disabled = false;
 
     @Column(name = "birth_date")
     private LocalDateTime birthDate;
@@ -51,12 +51,12 @@ public class User {
     @Column(name = "last_seen")
     private LocalDateTime lastSeen;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "metadata", columnDefinition = "jsonb")
-    private String metadata;
+    private Object metadata;
 
     @Column(name = "avatar_url")
     private String avatarUrl;

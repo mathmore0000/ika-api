@@ -12,12 +12,12 @@ CREATE TABLE auth.users
     locale VARCHAR(2) NOT NULL DEFAULT 'pt',  
     phone_number VARCHAR(15),  
     password_hash VARCHAR(60) NOT NULL,  
-    role VARCHAR(20) NOT NULL,  
+    role VARCHAR(20) NOT NULL DEFAULT 'user',
     disabled BOOLEAN NOT NULL DEFAULT FALSE,  
     birth_date DATE,  
     last_seen TIMESTAMP,  
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
-    metadata JSONB,  
+    metadata JSONB DEFAULT '{}',
     avatar_url VARCHAR(255),  
     UNIQUE (email)
 ); 

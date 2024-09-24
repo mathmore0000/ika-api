@@ -12,10 +12,10 @@ import java.util.List;
 @Builder
 public class Role {
 
+    public static final String USER = "user";
+    public static final String ADMIN = "admin";
+
     @Id
     @Column(name = "role", nullable = false, unique = true)
     private String role;
-
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
-    private List<User> users;
 }
