@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 
 @Component
@@ -23,6 +24,12 @@ public class JwtRequestFilter extends OncePerRequestFilter implements Applicatio
 
     private UserService userService;
     private JwtUtil jwtUtil;
+
+    @Autowired
+    public JwtRequestFilter(UserService userService, JwtUtil jwtUtil) {
+        this.userService = userService;
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext ctx) {

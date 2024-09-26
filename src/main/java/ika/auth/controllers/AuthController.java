@@ -1,9 +1,9 @@
 package ika.auth.controllers;
 
-import ika.auth.controllers.classes.AuthRequest;
-import ika.auth.controllers.classes.RefreshTokenRequest;
-import ika.auth.controllers.classes.SignUpRequest;
-import ika.auth.controllers.classes.TokenResponse;
+import ika.auth.controllers.aux_classes.auth.AuthRequest;
+import ika.auth.controllers.aux_classes.auth.RefreshTokenRequest;
+import ika.auth.controllers.aux_classes.auth.SignUpRequest;
+import ika.auth.controllers.aux_classes.auth.TokenResponse;
 import ika.auth.entities.Role;
 import ika.auth.entities.User;
 import ika.auth.services.RoleService;

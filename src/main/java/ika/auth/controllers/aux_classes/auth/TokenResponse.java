@@ -1,4 +1,4 @@
-package ika.auth.controllers.classes;
+package ika.auth.controllers.aux_classes.auth;
 
 public class TokenResponse {
     private String jwt;

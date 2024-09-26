@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder; // Use PasswordEncoder genérico
 
+import java.util.Optional;
+
 @Service
 public class UserService implements UserDetailsService {
 
@@ -27,6 +29,7 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    // default jwt method
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
@@ -36,6 +39,12 @@ public class UserService implements UserDetailsService {
                 .password(user.getPasswordHash()) // Usar passwordHash
                 .authorities(user.getRole().getRole()) // Pegar o nome do papel (Role)
                 .build();
+    }
+
+    public Optional<User> loadUserByEmail(String email) throws UsernameNotFoundException {
+        Optional<User> user = userRepository.findByEmail(email);
+
+        return user;
     }
 
     public Boolean emailExists(String email)  {

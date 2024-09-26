@@ -40,13 +40,13 @@ CREATE TABLE public.medication
     disabled BOOLEAN NOT NULL DEFAULT FALSE,  
     band INT NOT NULL,  
     rating FLOAT,  
-    active_ingredient UUID,  
-    category UUID,  
+    id_active_ingredient UUID NOT NULL,
+    id_category UUID NOT NULL,
     dosage FLOAT NOT NULL,  
     quantity_card INT,  
     id_user UUID,  
     is_valid BOOLEAN NOT NULL DEFAULT FALSE,  
-    max_time VARCHAR(20),  
+    max_time FLOAT,
     time_between FLOAT NOT NULL
 ); 
 
@@ -58,7 +58,7 @@ CREATE TABLE public.user_medication
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),  
     quantity_int INT,  
     quantity_ml FLOAT,  
-    max_time INT,  
+    max_time FLOAT,
     time_between FLOAT NOT NULL,  
     first_dosage_time TIMESTAMP NOT NULL,  
     max_validation_time FLOAT
@@ -171,13 +171,13 @@ REFERENCES auth.users (id);
 
 -- Add foreign key constraints to public.medication
 ALTER TABLE public.medication 
-ADD CONSTRAINT fk_active_ingredient 
-FOREIGN KEY (active_ingredient) 
+ADD CONSTRAINT fk_id_active_ingredient
+FOREIGN KEY (id_active_ingredient)
 REFERENCES public.active_ingredient (id);
 
 ALTER TABLE public.medication 
-ADD CONSTRAINT fk_category 
-FOREIGN KEY (category) 
+ADD CONSTRAINT fk_id_category
+FOREIGN KEY (id_category)
 REFERENCES public.category (id);
 
 ALTER TABLE public.medication 
