@@ -88,10 +88,10 @@ public class AuthController {
         User newUser = User.builder()
                 .displayName(signUpRequest.getDisplayName())
                 .email(signUpRequest.getEmail())
-                .password(signUpRequest.getPassword()) // Note que estamos salvando o hash da senha
+                .password(signUpRequest.getPassword())
                 .locale(signUpRequest.getLocale())
                 .role(defaultRole)
-                .metadata("")
+                .metadata("{}")
                 .createdAt(LocalDateTime.now())
                 .build();
 

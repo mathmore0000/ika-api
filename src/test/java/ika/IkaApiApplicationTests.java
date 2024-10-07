@@ -1,4 +1,4 @@
-package ika.ika_api;
+package ika;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
