@@ -1,16 +1,14 @@
 package ika.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ika.auth.controllers.aux_classes.auth.AuthRequest;
-import ika.auth.controllers.aux_classes.auth.RefreshTokenRequest;
-import ika.auth.controllers.aux_classes.auth.SignUpRequest;
-import ika.auth.controllers.aux_classes.auth.TokenResponse;
-import ika.auth.entities.Role;
-import ika.auth.entities.User;
-import ika.auth.repositories.RoleRepository;
-import ika.auth.repositories.UserRepository;
+import ika.controllers.aux_classes.auth.AuthRequest;
+import ika.controllers.aux_classes.auth.RefreshTokenRequest;
+import ika.controllers.aux_classes.auth.SignUpRequest;
+import ika.controllers.aux_classes.auth.TokenResponse;
+import ika.repositories.RoleRepository;
+import ika.repositories.UserRepository;
+//import ika.Util.createUser;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,8 +21,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.containers.PostgreSQLContainer;
-
-import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -50,6 +46,20 @@ class AuthControllerIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    void createUser(String displayName, String email, String password, String locale) throws Exception {
+        SignUpRequest signUpRequest = new SignUpRequest();
+        signUpRequest.setDisplayName(displayName);
+        signUpRequest.setEmail(email);
+        signUpRequest.setPassword(password);
+        signUpRequest.setLocale(locale);
+
+        mockMvc.perform(post("/v1/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signUpRequest)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("User registered successfully"));
+    }
+
     // Definir o contêiner PostgreSQL como estático e anotá-lo com @Container para Testcontainers gerenciar
     @Container
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14.1")
@@ -69,21 +79,6 @@ class AuthControllerIntegrationTest {
     static void setup() {
         postgres.start();
     }
-
-    void createUser(String displayName, String email, String password, String locale) throws Exception {
-        SignUpRequest signUpRequest = new SignUpRequest();
-        signUpRequest.setDisplayName(displayName);
-        signUpRequest.setEmail(email);
-        signUpRequest.setPassword(password);
-        signUpRequest.setLocale(locale);
-
-        mockMvc.perform(post("/v1/auth/signup")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signUpRequest)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("User registered successfully"));
-    }
-
 
     @Test
     void testSignUpSuccess() throws Exception {
