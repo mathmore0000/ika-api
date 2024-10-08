@@ -1,9 +1,10 @@
 package ika.controllers;
 
 import ika.controllers.aux_classes.CustomPageResponse;
-import ika.controllers.medication.MedicationRequest;
-import ika.controllers.medication.MedicationResponse;
+import ika.controllers.aux_classes.medication.MedicationRequest;
+import ika.controllers.aux_classes.medication.MedicationResponse;
 import ika.services.MedicationService;
+import ika.utils.GlobalValues;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,17 +44,8 @@ public class MedicationController {
             @RequestParam(defaultValue = "name") String sortBy,  // Campo de ordenação
             @RequestParam(defaultValue = "asc") String sortDirection // Direção de ordenação
     ) {
-        int minSize = 1;  // Tamanho mínimo permitido
-        int maxSize = 500;  // Tamanho máximo permitido
-        if (page < 0) {
-            page = 0;
-        }
-        // Ajustar o tamanho da página para estar dentro do limite
-        if (size < minSize) {
-            size = minSize;
-        } else if (size > maxSize) {
-            size = maxSize;
-        }
+        page = CustomPageResponse.getValidPage(page);
+        size = CustomPageResponse.getValidSize(size);
         System.out.println(name + categoryId + activeIngredientId + page + size);
 
         // Cria um objeto Pageable com base nos parâmetros page e size

@@ -1,18 +1,20 @@
 package ika.services;
 
+import ika.controllers.aux_classes.category.CategoryResponse;
 import ika.entities.Category;
 import ika.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
 public class CategoryService {
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
+
 
     // Método para buscar uma categoria por ID
     public Category findById(UUID id) {
@@ -20,13 +22,24 @@ public class CategoryService {
                 .orElseThrow(() -> new RuntimeException("Category not found"));
     }
 
-    // Método para criar uma nova categoria
-    public Category createCategory(Category category) {
-        return categoryRepository.save(category);
+    @Autowired
+    public CategoryService(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
     }
 
-    // Método para listar todas as categorias
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public CategoryResponse getCategoryById(UUID id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        return new CategoryResponse(category);
+    }
+
+    public Page<CategoryResponse> getAllCategories(String description, Pageable pageable) {
+        System.out.println(description);
+        return categoryRepository.findAllWithFilters(description, pageable)
+                .map(this::convertToCategoryResponse);
+    }
+
+    private CategoryResponse convertToCategoryResponse(Category category) {
+        return new CategoryResponse(category);
     }
 }

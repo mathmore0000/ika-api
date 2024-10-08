@@ -1,7 +1,7 @@
 package ika.services;
 
-import ika.controllers.medication.MedicationRequest;
-import ika.controllers.medication.MedicationResponse;
+import ika.controllers.aux_classes.medication.MedicationRequest;
+import ika.controllers.aux_classes.medication.MedicationResponse;
 import ika.entities.Medication;
 import ika.entities.User;
 import ika.repositories.MedicationRepository;

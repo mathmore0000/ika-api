@@ -1,5 +1,6 @@
 package ika.controllers.aux_classes;
 
+import ika.utils.GlobalValues;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,6 +24,25 @@ public class CustomPageResponse<T> {
         this.offset = offset;
         this.totalPages = totalPages;
     }
+
+    public static int getValidSize(int size){
+    // Ajustar o tamanho da página para estar dentro do limite
+        System.out.println(GlobalValues.MIN_REQUEST.getValue());
+        if (size < GlobalValues.MIN_REQUEST.getValue()) {
+            size = GlobalValues.MIN_REQUEST.getValue();
+        } else if (size > GlobalValues.MAX_REQUEST.getValue()) {
+            size = GlobalValues.MAX_REQUEST.getValue();
+        }
+        return size;
+    }
+    public static int getValidPage(int page){
+        if (page < 0) {
+            page = 0;
+        }
+        return page;
+    }
+
+
 
     // Getters e Setters
     public List<T> getContent() {

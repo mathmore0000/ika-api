@@ -1,4 +1,4 @@
-package ika.controllers.medication;
+package ika.controllers.aux_classes.medication;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

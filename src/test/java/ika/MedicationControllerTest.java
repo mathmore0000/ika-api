@@ -1,7 +1,7 @@
 package ika;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ika.controllers.medication.MedicationRequest;
+import ika.controllers.aux_classes.medication.MedicationRequest;
 import ika.entities.Medication;
 import ika.repositories.MedicationRepository;
 import org.junit.jupiter.api.BeforeAll;

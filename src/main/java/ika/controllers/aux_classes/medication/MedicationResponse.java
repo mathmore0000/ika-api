@@ -1,4 +1,4 @@
-package ika.controllers.medication;
+package ika.controllers.aux_classes.medication;
 
 import ika.entities.ActiveIngredient;
 import ika.entities.Category;
