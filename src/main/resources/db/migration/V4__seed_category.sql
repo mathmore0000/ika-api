@@ -18,3 +18,4 @@ INSERT INTO category (description) VALUES ('Hipotensor');
 INSERT INTO category (description) VALUES ('Imunossupressor');
 INSERT INTO category (description) VALUES ('Antineoplásico');
 INSERT INTO category (description) VALUES ('Vasodilatador');
+INSERT INTO category (description) VALUES ('Antimalárico');

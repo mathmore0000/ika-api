@@ -15,8 +15,8 @@ public class FlywayListenerConfig {
         FlywayMigrationStrategy strategy = new FlywayMigrationStrategy() {
             @Override
             public void migrate(Flyway flyway) {
-//                flyway.clean();
-//                flyway.migrate();
+                flyway.clean();
+                flyway.migrate();
             }
         };
 
