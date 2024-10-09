@@ -81,6 +81,8 @@ class CategoryControllerTest {
     void initialize() throws Exception {
         // Create a default user and generate a JWT token before each test
         jwt = getJwtFromUser();
+        medicationRepository.deleteAll();
+        categoryRepository.deleteAll();
     }
 
     // Create a user and generate a JWT token
@@ -152,8 +154,6 @@ class CategoryControllerTest {
     @Test
     void testGetAllCategoriesWithFilterAndPagination() throws Exception {
         // Create and save multiple categories
-        medicationRepository.deleteAll();
-        categoryRepository.deleteAll();
         categoryRepository.save(new Category(UUID.randomUUID(), "Broncodilatador"));
         categoryRepository.save(new Category(UUID.randomUUID(), "Cardioprotetor"));
         categoryRepository.save(new Category(UUID.randomUUID(), "Fitoterápico"));
