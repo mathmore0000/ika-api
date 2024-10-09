@@ -1,6 +1,7 @@
 package ika.repositories;
 
 import ika.entities.ActiveIngredient;
+import ika.entities.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,4 +19,5 @@ public interface ActiveIngredientRepository extends JpaRepository<ActiveIngredie
     @Query("SELECT ai FROM ActiveIngredient ai " +
             "WHERE COALESCE(:description, '') = '' OR LOWER(ai.description) LIKE LOWER(CONCAT('%', :description, '%'))")
     Page<ActiveIngredient> findAllWithFilters(String description, Pageable pageable);
+    Optional<ActiveIngredient> findByDescription(String description);
 }

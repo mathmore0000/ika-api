@@ -1,4 +1,4 @@
-package ika.auth;
+package ika;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ika.controllers.aux_classes.auth.AuthRequest;

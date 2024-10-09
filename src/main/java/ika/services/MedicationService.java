@@ -6,10 +6,14 @@ import ika.entities.Medication;
 import ika.entities.User;
 import ika.repositories.MedicationRepository;
 import ika.utils.CurrentUserProvider;
+import ika.utils.exceptions.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.UUID;
 
@@ -55,10 +59,11 @@ public class MedicationService {
         medicationRepository.save(medication);
     }
 
+    @ExceptionHandler(RuntimeException.class)
     public MedicationResponse getMedicationById(UUID id) {
         System.out.println("id" + id);
         Medication medication = medicationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Medication not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("No medication found"));
         System.out.println("medication -> " + medication);
         return new MedicationResponse(medication);
     }

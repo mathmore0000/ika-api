@@ -1,5 +1,6 @@
 package ika.config;
 
+import ika.utils.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -21,14 +22,18 @@ public class GlobalExceptionHandler {
                 .body("Invalid parameter type: '" + ex.getValue() + "' for parameter '" + ex.getName() + "'.");
     }
 
-    /**
-     * Trata outras exceções gerais que você desejar capturar e tratar globalmente.
-     */
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<String> handleNoResourceFoundExceptions(Exception ex) {
+    public ResponseEntity<String> handleNoResourceFoundExceptions() {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body("No resource found");
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFoundExceptions(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
     }
 
     /**

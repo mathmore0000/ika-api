@@ -24,4 +24,7 @@ public class ActiveIngredient {
     public String getDescription() {
         return description;
     }
+    public String setDescription(String description) {
+        return this.description = description;
+    }
 }
