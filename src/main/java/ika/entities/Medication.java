@@ -10,6 +10,27 @@ import java.util.UUID;
 @Table(name = "medication", schema = "public")
 public class Medication {
 
+    public Medication(UUID id, String name, boolean disabled, int band, Float rating,
+                      ActiveIngredient activeIngredient, Category category, float dosage,
+                      Integer quantityCard, User user, boolean isValid, float maxTime, float timeBetween) {
+        this.id = id;
+        this.name = name;
+        this.disabled = disabled;
+        this.band = band;
+        this.rating = rating;
+        this.activeIngredient = activeIngredient;
+        this.category = category;
+        this.dosage = dosage;
+        this.quantityCard = quantityCard;
+        this.user = user;
+        this.isValid = isValid;
+        this.maxTime = maxTime;
+        this.timeBetween = timeBetween;
+    }
+
+    public Medication() {
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", updatable = false, nullable = false)

@@ -88,6 +88,9 @@ class MedicationControllerTest {
     void initialize() throws Exception {
         // Create a default user and generate a JWT token before each test
         jwt = getJwtFromUser();
+        medicationRepository.deleteAll();
+        categoryRepository.deleteAll();
+        activeIngredientRepository.deleteAll();
     }
 
     // Create a user and generate a JWT token
@@ -188,5 +191,38 @@ class MedicationControllerTest {
                         .header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testGetAllMedicationsWithFilterAndPagination() throws Exception {
+        // Create and save related entities: category and active ingredient
+        Category category = categoryRepository.save(new Category(UUID.randomUUID(), "Analgesic"));
+        ActiveIngredient activeIngredient = activeIngredientRepository.save(new ActiveIngredient(UUID.randomUUID(), "Paracetamol"));
+
+        // Create and save multiple medications with different categories and active ingredients
+        medicationRepository.save(new Medication(UUID.randomUUID(), "Ibuprofen 400mg", false, 3, 10F, activeIngredient, category, 400, 30, null, true, 24, 8));
+        medicationRepository.save(new Medication(UUID.randomUUID(), "Paracetamol 500mg", false, 3, 10F, activeIngredient, category, 500, 20, null, true, 24, 8));
+        medicationRepository.save(new Medication(UUID.randomUUID(), "Paracetamol 750mg", false, 3, 10F, activeIngredient, category, 750, 15, null, true, 24, 8));
+
+        // Perform the GET request with filter and pagination
+        mockMvc.perform(get("/v1/medications/")
+                        .param("page", "0")
+                        .param("size", "2")
+                        .header("Authorization", "Bearer " + jwt)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].name").value("Ibuprofen 400mg"))
+                .andExpect(jsonPath("$.content[1].name").value("Paracetamol 500mg"));
+
+        // Perform the GET request for the second page
+        mockMvc.perform(get("/v1/medications/")
+                        .param("page", "1")
+                        .param("size", "2")
+                        .header("Authorization", "Bearer " + jwt)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].name").value("Paracetamol 750mg"));
     }
 }
