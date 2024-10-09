@@ -20,18 +20,12 @@ public class CategoryService {
     // Método para buscar uma categoria por ID
     public Category findById(UUID id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
     }
 
     @Autowired
     public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
-    }
-
-    public CategoryResponse getCategoryById(UUID id) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        return new CategoryResponse(category);
     }
 
     public Page<CategoryResponse> getAllCategories(String description, Pageable pageable) {

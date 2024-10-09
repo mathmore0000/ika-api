@@ -2,6 +2,7 @@ package ika.controllers;
 
 import ika.controllers.aux_classes.CustomPageResponse;
 import ika.controllers.aux_classes.active_ingredient.ActiveIngredientResponse;
+import ika.entities.ActiveIngredient;
 import ika.services.ActiveIngredientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -46,7 +47,8 @@ public class ActiveIngredientController {
     // Endpoint para buscar um ingrediente ativo específico por id
     @GetMapping("/{id}")
     public ResponseEntity<ActiveIngredientResponse> getActiveIngredientById(@PathVariable UUID id) {
-        ActiveIngredientResponse ingredientResponse = activeIngredientService.getActiveIngredientById(id);
-        return ResponseEntity.ok(ingredientResponse);
+        ActiveIngredient activeIngredient = activeIngredientService.findById(id);
+        ActiveIngredientResponse activeIngredientResponse = new ActiveIngredientResponse(activeIngredient);
+        return ResponseEntity.ok(activeIngredientResponse);
     }
 }

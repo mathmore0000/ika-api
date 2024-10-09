@@ -8,6 +8,14 @@ import java.util.UUID;
 @Table(name = "active_ingredient", schema = "public")
 public class ActiveIngredient {
 
+    public ActiveIngredient(UUID id, String description) {
+        this.id = id;
+        this.description = description;
+    }
+
+    public ActiveIngredient() {
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", updatable = false, nullable = false)

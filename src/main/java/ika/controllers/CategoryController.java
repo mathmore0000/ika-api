@@ -2,6 +2,7 @@ package ika.controllers;
 
 import ika.controllers.aux_classes.category.CategoryResponse;
 import ika.controllers.aux_classes.CustomPageResponse;
+import ika.entities.Category;
 import ika.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,7 +22,8 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable UUID id) {
-        CategoryResponse categoryResponse = categoryService.getCategoryById(id);
+        Category category = categoryService.findById(id);
+        CategoryResponse categoryResponse = new CategoryResponse(category);
         return ResponseEntity.ok(categoryResponse);
     }
 
