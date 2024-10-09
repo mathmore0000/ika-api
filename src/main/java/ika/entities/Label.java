@@ -17,8 +17,8 @@ public class Label {
     // Constructors
     public Label() {}
 
-    public Label(String description) {
-        this.description = description;
+    public Label(UUID id, String description) {
+        this.id = id; this.description = description;
     }
 
     // Getters and Setters
