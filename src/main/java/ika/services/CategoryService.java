@@ -3,6 +3,7 @@ package ika.services;
 import ika.controllers.aux_classes.category.CategoryResponse;
 import ika.entities.Category;
 import ika.repositories.CategoryRepository;
+import ika.utils.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,7 @@ public class CategoryService {
 
     public CategoryResponse getCategoryById(UUID id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         return new CategoryResponse(category);
     }
 

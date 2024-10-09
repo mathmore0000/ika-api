@@ -8,11 +8,18 @@ import java.util.UUID;
 @Table(name = "category", schema = "public")
 public class Category {
 
+    public Category(UUID id, String description) {
+        this.id = id;
+        this.description = description;
+    }
+
+    public Category() {
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
-
 
     @Column(name = "description", nullable = false)
     private String description;

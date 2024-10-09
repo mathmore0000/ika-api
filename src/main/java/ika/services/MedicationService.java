@@ -63,7 +63,7 @@ public class MedicationService {
     public MedicationResponse getMedicationById(UUID id) {
         System.out.println("id" + id);
         Medication medication = medicationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No medication found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Medication not found"));
         System.out.println("medication -> " + medication);
         return new MedicationResponse(medication);
     }

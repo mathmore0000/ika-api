@@ -3,6 +3,7 @@ package ika.services;
 import ika.controllers.aux_classes.active_ingredient.ActiveIngredientResponse;
 import ika.entities.ActiveIngredient;
 import ika.repositories.ActiveIngredientRepository;
+import ika.utils.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +21,7 @@ public class ActiveIngredientService {
     // Método para buscar um ingrediente ativo por ID
     public ActiveIngredient findById(UUID id) {
         return activeIngredientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Active Ingredient not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Active Ingredient not found"));
     }
 
     // Método para criar um novo ingrediente ativo
