@@ -3,11 +3,14 @@ package ika.utils;
 import ika.entities.User;
 import ika.services.UserService;
 import ika.utils.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -42,12 +45,23 @@ public class CurrentUserProvider {
     }
 
     public UUID getCurrentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getCredentials() != null) {
-            String token = (String) authentication.getCredentials(); // Assume JWT is passed as credentials
+        String token = getTokenFromRequest(); // Get the JWT token from the request headers
+        if (token != null) {
             return jwtUtil.extractUserId(token); // Extract user ID from the token
         }
         throw new RuntimeException("No authentication token found");
+    }
+
+    private String getTokenFromRequest() {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            String authorizationHeader = request.getHeader("Authorization");
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                return authorizationHeader.substring(7); // Remove "Bearer " to get the actual token
+            }
+        }
+        return null;
     }
 
     public void clearCache() {
