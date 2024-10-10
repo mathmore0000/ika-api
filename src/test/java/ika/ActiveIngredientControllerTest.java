@@ -132,7 +132,7 @@ class ActiveIngredientControllerTest {
         activeIngredientRepository.save(new ActiveIngredient(UUID.randomUUID(), "Aspirin"));
 
         // Perform the GET request to retrieve all active ingredients
-        mockMvc.perform(get("/v1/active-ingredients/")
+        mockMvc.perform(get("/v1/active-ingredients")
                         .header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -158,7 +158,7 @@ class ActiveIngredientControllerTest {
         activeIngredientRepository.save(new ActiveIngredient(UUID.randomUUID(), "Ibuprofen"));
 
         // Perform the GET request with filter and pagination
-        mockMvc.perform(get("/v1/active-ingredients/")
+        mockMvc.perform(get("/v1/active-ingredients")
                         .param("page", "0")
                         .param("size", "2")
                         .header("Authorization", "Bearer " + jwt)
@@ -168,7 +168,7 @@ class ActiveIngredientControllerTest {
                 .andExpect(jsonPath("$.content[0].description").value("Acetaminophen"));
 
 
-        mockMvc.perform(get("/v1/active-ingredients/")
+        mockMvc.perform(get("/v1/active-ingredients")
                         .param("page", "1")
                         .param("size", "2")
                         .header("Authorization", "Bearer " + jwt)
