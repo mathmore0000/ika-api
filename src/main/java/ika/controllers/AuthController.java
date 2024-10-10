@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/v1/auth")
@@ -47,7 +48,8 @@ public class AuthController {
         String username = jwtUtil.extractUsername(refreshToken);
         UserDetails userDetails = userService.loadUserByUsername(username);
 
-        String newJwt = jwtUtil.generateToken(userDetails);
+        final Optional<User> user = userService.loadUserByEmail(username);
+        String newJwt = jwtUtil.generateToken(userDetails, user.get().getId());
         String newRefreshToken = jwtUtil.generateRefreshToken(userDetails);
 
         TokenResponse tokenResponse = new TokenResponse(newJwt, newRefreshToken);
@@ -66,8 +68,9 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 
-        final UserDetails userDetails = userService.loadUserByUsername(authRequest.getUsername());
-        final String jwt = jwtUtil.generateToken(userDetails);
+        final Optional<User> user = userService.loadUserByEmail(authRequest.getUsername());
+        UserDetails userDetails = userService.loadUserByUsername(authRequest.getUsername());
+        final String jwt = jwtUtil.generateToken(userDetails, user.get().getId());
         final String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
         TokenResponse tokenResponse = new TokenResponse(jwt, refreshToken);

@@ -2,11 +2,10 @@ package ika;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ika.controllers.aux_classes.auth.SignUpRequest;
-import ika.entities.ActiveIngredient;
 import ika.entities.User;
-import ika.repositories.ActiveIngredientRepository;
-import ika.repositories.MedicationRepository;
+import ika.entities.UserResponsible;
 import ika.repositories.UserRepository;
+import ika.repositories.UserResponsibleRepository;
 import ika.services.UserService;
 import ika.utils.JwtUtil;
 import org.junit.jupiter.api.BeforeAll;
@@ -27,37 +26,33 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test") // Use the test profile
-class ActiveIngredientControllerTest {
+@ActiveProfiles("test")
+class UserResponsibleControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private MedicationRepository medicationRepository;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    private ActiveIngredientRepository activeIngredientRepository;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    private String jwt;
+    private UserResponsibleRepository userResponsibleRepository;
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private UserService userService;
 
     @Autowired
-    private UserService userService;
+    private JwtUtil jwtUtil;
+
+    private String jwt;
 
     @Container
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14.1")
@@ -81,11 +76,10 @@ class ActiveIngredientControllerTest {
     void initialize() throws Exception {
         // Create a default user and generate a JWT token before each test
         jwt = getJwtFromUser();
-        medicationRepository.deleteAll();
-        activeIngredientRepository.deleteAll();
+        userResponsibleRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
-    // Create a user and generate a JWT token
     private String getJwtFromUser() throws Exception {
         String email = "default_user@ika.com";
         createUser("Default User", email, "password", "pt");
@@ -94,12 +88,9 @@ class ActiveIngredientControllerTest {
         return jwtUtil.generateToken(userDetails, user.get().getId());
     }
 
-    // Method to create a new user for testing purposes
     void createUser(String displayName, String email, String password, String locale) throws Exception {
         Optional<User> user = userRepository.findByEmail(email);
-
         if (user.isEmpty()) {
-            System.out.println("Creating user...");
             SignUpRequest signUpRequest = new SignUpRequest();
             signUpRequest.setDisplayName(displayName);
             signUpRequest.setEmail(email);
@@ -114,69 +105,106 @@ class ActiveIngredientControllerTest {
     }
 
     @Test
-    void testGetActiveIngredientByIdSuccess() throws Exception {
-        // Create and save an active ingredient entity to the database first
-        ActiveIngredient activeIngredient = new ActiveIngredient(UUID.randomUUID(), "Ibuprofen");
-        activeIngredient = activeIngredientRepository.save(activeIngredient);
+    void testCreateRequestSuccess() throws Exception {
+        // Create a new responsible user to be associated with the request
+        UUID responsibleId = createResponsibleUser("Responsible User", "responsible_user@ika.com");
 
-        // Perform the GET request to retrieve the active ingredient by ID
-        mockMvc.perform(get("/v1/active-ingredients/" + activeIngredient.getId())
+        // Perform the POST request to create a responsible request
+        mockMvc.perform(post("/v1/responsibles")
+                        .param("idResponsible", responsibleId.toString())
+                        .header("Authorization", "Bearer " + jwt)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void testCreateRequestDuplicate() throws Exception {
+        UUID responsibleId = createResponsibleUser("Responsible User", "responsible_user@ika.com");
+
+        // Create an initial request
+        mockMvc.perform(post("/v1/responsibles")
+                        .param("idResponsible", responsibleId.toString())
+                        .header("Authorization", "Bearer " + jwt)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        // Try to create the same request again to verify conflict
+        mockMvc.perform(post("/v1/responsibles")
+                        .param("idResponsible", responsibleId.toString())
+                        .header("Authorization", "Bearer " + jwt)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void testAcceptRequestSuccess() throws Exception {
+        UUID responsibleId = createResponsibleUser("Responsible User", "responsible_user@ika.com");
+
+        // Create a new request
+        mockMvc.perform(post("/v1/responsibles")
+                        .param("idResponsible", responsibleId.toString())
+                        .header("Authorization", "Bearer " + jwt)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        // Accept the request
+        mockMvc.perform(put("/v1/responsibles/accept")
+                        .param("idResponsible", responsibleId.toString())
                         .header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.description").value("Ibuprofen"));
+                .andExpect(jsonPath("$.accepted").value(true));
     }
 
     @Test
-    void testGetAllActiveIngredientsSuccess() throws Exception {
-        // Create and save multiple active ingredients
-        activeIngredientRepository.save(new ActiveIngredient(UUID.randomUUID(), "Ibuprofen"));
-        activeIngredientRepository.save(new ActiveIngredient(UUID.randomUUID(), "Aspirin"));
+    void testDeleteRequestByResponsibleSuccess() throws Exception {
+        UUID responsibleId = createResponsibleUser("Responsible User", "responsible_user@ika.com");
 
-        // Perform the GET request to retrieve all active ingredients
-        mockMvc.perform(get("/v1/active-ingredients")
+        // Create a new request
+        mockMvc.perform(post("/v1/responsibles")
+                        .param("idResponsible", responsibleId.toString())
                         .header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray());
-    }
+                .andExpect(status().isCreated());
 
-    @Test
-    void testGetActiveIngredientByIdNotFound() throws Exception {
-        // Create a random UUID for a non-existent active ingredient
-        UUID nonExistentId = UUID.randomUUID();
-
-        mockMvc.perform(get("/v1/active-ingredients/" + nonExistentId)
+        // Delete the request by the responsible user
+        mockMvc.perform(delete("/v1/responsibles/by-responsible")
+                        .param("idResponsible", responsibleId.toString())
                         .header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNoContent());
     }
 
     @Test
-    void testGetAllActiveIngredientsWithFilterAndPagination() throws Exception {
-        // Create and save multiple active ingredients
-        activeIngredientRepository.save(new ActiveIngredient(UUID.randomUUID(), "Acetaminophen"));
-        activeIngredientRepository.save(new ActiveIngredient(UUID.randomUUID(), "Aspirin"));
-        activeIngredientRepository.save(new ActiveIngredient(UUID.randomUUID(), "Ibuprofen"));
+    void testGetAllResponsibleWithFilterAndPagination() throws Exception {
+        UUID responsibleId = createResponsibleUser("Responsible User", "responsible_user@ika.com");
+
+        // Create multiple responsible requests
+        createResponsibleRequest(responsibleId);
+        createResponsibleRequest(responsibleId);
 
         // Perform the GET request with filter and pagination
-        mockMvc.perform(get("/v1/active-ingredients")
+        mockMvc.perform(get("/v1/responsibles/responsible")
                         .param("page", "0")
                         .param("size", "2")
                         .header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].description").value("Acetaminophen"));
+                .andExpect(jsonPath("$.content[0].responsibleId").value(responsibleId.toString()));
+    }
 
+    private UUID createResponsibleUser(String displayName, String email) throws Exception {
+        createUser(displayName, email, "password", "pt");
+        User user = userRepository.findByEmail(email).orElseThrow();
+        return user.getId();
+    }
 
-        mockMvc.perform(get("/v1/active-ingredients")
-                        .param("page", "1")
-                        .param("size", "2")
+    private void createResponsibleRequest(UUID responsibleId) throws Exception {
+        mockMvc.perform(post("/v1/responsibles")
+                        .param("idResponsible", responsibleId.toString())
                         .header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].description").value("Ibuprofen"));
+                .andExpect(status().isCreated());
     }
 }

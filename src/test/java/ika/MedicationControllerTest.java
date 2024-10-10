@@ -95,9 +95,11 @@ class MedicationControllerTest {
 
     // Create a user and generate a JWT token
     private String getJwtFromUser() throws Exception {
-        createUser("Default User", "default_user@ika.com", "password", "pt");
-        final UserDetails userDetails = userService.loadUserByUsername("default_user@ika.com");
-        return jwtUtil.generateToken(userDetails);
+        String email = "default_user@ika.com";
+        createUser("Default User", email, "password", "pt");
+        final Optional<User> user = userService.loadUserByEmail(email);
+        final UserDetails userDetails = userService.loadUserByUsername(email);
+        return jwtUtil.generateToken(userDetails, user.get().getId());
     }
 
     // Method to create a new user for testing purposes

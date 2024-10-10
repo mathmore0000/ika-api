@@ -13,6 +13,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class JwtUtil {
@@ -52,8 +53,9 @@ public class JwtUtil {
     }
 
     // Gera o token JWT usando as informações do UserDetails
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails, UUID userId) {
         Map<String, Object> claims = new HashMap<>(); // Você pode adicionar claims extras aqui
+        claims.put("userId", userId); // Adiciona as roles do usuário
         claims.put("roles", userDetails.getAuthorities()); // Adiciona as roles do usuário
         return createToken(claims, userDetails.getUsername());
     }
@@ -87,6 +89,11 @@ public class JwtUtil {
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    public UUID extractUserId(String token) {
+        Claims claims = extractAllClaims(token);
+        return UUID.fromString(claims.get("userId", String.class)); // Extract the userId from the claims
     }
 
     // Verifica se o token expirou

@@ -1,7 +1,6 @@
 package ika.controllers;
 
 import ika.controllers.aux_classes.CustomPageResponse;
-import ika.controllers.aux_classes.medication.MedicationResponse;
 import ika.entities.UserResponsible;
 import ika.services.UserResponsibleService;
 import ika.utils.CurrentUserProvider;  // Assuming you have this utility
