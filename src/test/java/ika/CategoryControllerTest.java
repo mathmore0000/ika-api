@@ -133,7 +133,7 @@ class CategoryControllerTest {
         categoryRepository.save(new Category(UUID.randomUUID(), "Analgesic"));
 
         // Perform the GET request to retrieve all categories
-        mockMvc.perform(get("/v1/categories/")
+        mockMvc.perform(get("/v1/categories")
                         .header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -159,7 +159,7 @@ class CategoryControllerTest {
         categoryRepository.save(new Category(UUID.randomUUID(), "Fitoterápico"));
 
         // Perform the GET request with filter and pagination
-        mockMvc.perform(get("/v1/categories/")
+        mockMvc.perform(get("/v1/categories")
                         .param("page", "0")
                         .param("size", "2")
                         .header("Authorization", "Bearer " + jwt)
@@ -169,7 +169,7 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$.content[0].description").value("Broncodilatador"));
 
 
-        mockMvc.perform(get("/v1/categories/")
+        mockMvc.perform(get("/v1/categories")
                         .param("page", "1")
                         .param("size", "2")
                         .header("Authorization", "Bearer " + jwt)
