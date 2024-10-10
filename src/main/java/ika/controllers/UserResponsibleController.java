@@ -1,5 +1,7 @@
 package ika.controllers;
 
+import ika.controllers.aux_classes.CustomPageResponse;
+import ika.controllers.aux_classes.medication.MedicationResponse;
 import ika.entities.UserResponsible;
 import ika.services.UserResponsibleService;
 import ika.utils.CurrentUserProvider;  // Assuming you have this utility
@@ -62,16 +64,53 @@ public class UserResponsibleController {
     }
 
     @GetMapping("/responsible")
-    public ResponseEntity<Page<UserResponsible>> getAllResponsible(Pageable pageable) {
+    public ResponseEntity<CustomPageResponse<UserResponsible>> getAllResponsible(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "200") int size,
+            @RequestParam(value = "accepted", required = false) Boolean accepted,  // Use Boolean to allow null values
+            @RequestParam(defaultValue = "createdAt") String sortBy,  // Sorting field
+            @RequestParam(defaultValue = "asc") String sortDirection) { // Sorting direction
         UUID idResponsible = currentUserProvider.getCurrentUser().getId();
-        Page<UserResponsible> responsibles = userResponsibleService.getAllResponsibles(idResponsible, pageable);
-        return ResponseEntity.ok(responsibles);
+        Pageable pageable = CustomPageResponse.createPageableWithSort(page, size, sortBy, sortDirection);
+        Page<UserResponsible> responsiblesPage = userResponsibleService.getAllResponsibles(idResponsible, accepted, pageable);
+
+        CustomPageResponse<UserResponsible> customPageResponse = new CustomPageResponse<>(
+                responsiblesPage.getContent(),
+                responsiblesPage.getNumber(),
+                responsiblesPage.getSize(),
+                responsiblesPage.getSort(),
+                responsiblesPage.getPageable().getOffset(),
+                responsiblesPage.getTotalPages()
+        );
+
+        return ResponseEntity.ok(customPageResponse);
     }
 
+
     @GetMapping("/user")
-    public ResponseEntity<Page<UserResponsible>> getAllUser(Pageable pageable) {
+    public ResponseEntity<CustomPageResponse<UserResponsible>> getAllUser(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "200") int size,
+            @RequestParam(value = "accepted", required = false) Boolean accepted,
+            @RequestParam(defaultValue = "createdAt") String sortBy,  // Campo de ordenação
+            @RequestParam(defaultValue = "asc") String sortDirection) { // Direção de ordenação)
         UUID idUser = currentUserProvider.getCurrentUser().getId();
-        Page<UserResponsible> users = userResponsibleService.getAllUsers(idUser, pageable);
-        return ResponseEntity.ok(users);
+
+        page = CustomPageResponse.getValidPage(page);
+        size = CustomPageResponse.getValidSize(size);
+
+        // Cria um objeto Pageable com base nos parâmetros page e size
+        Pageable pageable = CustomPageResponse.createPageableWithSort(page, size, sortBy, sortDirection);
+        Page<UserResponsible> usersPage = userResponsibleService.getAllUsers(idUser, accepted, pageable);
+
+        CustomPageResponse<UserResponsible> customPageResponse = new CustomPageResponse<>(
+                usersPage.getContent(),
+                usersPage.getNumber(),
+                usersPage.getSize(),
+                usersPage.getSort(),
+                usersPage.getPageable().getOffset(),
+                usersPage.getTotalPages()
+        );
+        return ResponseEntity.ok(customPageResponse);
     }
 }

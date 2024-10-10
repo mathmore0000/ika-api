@@ -62,11 +62,12 @@ public class UserResponsibleService {
         return false;
     }
 
-    public Page<UserResponsible> getAllResponsibles(UUID idResponsible, Pageable pageable) {
-        return userResponsibleRepository.findByResponsibleId(idResponsible, pageable);
+    public Page<UserResponsible> getAllResponsibles(UUID idResponsible, Boolean accepted, Pageable pageable) {
+        return userResponsibleRepository.findByResponsibleIdAndAccepted(idResponsible, accepted, pageable);
     }
 
-    public Page<UserResponsible> getAllUsers(UUID idUser, Pageable pageable) {
-        return userResponsibleRepository.findByUserId(idUser, pageable);
+
+    public Page<UserResponsible> getAllUsers(UUID idUser, Boolean accepted, Pageable pageable) {
+        return userResponsibleRepository.findByUserIdAndAccepted(idUser, accepted, pageable);
     }
 }

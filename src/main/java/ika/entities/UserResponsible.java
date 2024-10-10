@@ -26,14 +26,14 @@ public class UserResponsible {
     @Column(name = "accepted", nullable = false)
     private Boolean accepted = false;
 
-    @Column(name = "datetime", nullable = false)
-    private LocalDateTime datetime = LocalDateTime.now();
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     // Constructor to set userId and responsibleId
     public UserResponsible(UUID userId, UUID responsibleId) {
         this.userId = userId;
         this.responsibleId = responsibleId;
-        this.datetime = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
     }
 
     // Inner class representing the composite key

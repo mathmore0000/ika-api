@@ -4,6 +4,7 @@ import ika.entities.UserResponsible;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -19,7 +20,9 @@ public interface UserResponsibleRepository extends JpaRepository<UserResponsible
 
     Optional<UserResponsible> findByUserIdAndResponsibleId(UUID userId, UUID responsibleId);
 
-    Page<UserResponsible> findByUserId(UUID userId, Pageable pageable);
+    @Query("SELECT ur FROM UserResponsible ur WHERE ur.userId = :userId AND (:accepted IS NULL OR ur.accepted = :accepted)")
+    Page<UserResponsible> findByUserIdAndAccepted(UUID userId, @Param("accepted") Boolean accepted, Pageable pageable);
 
-    Page<UserResponsible> findByResponsibleId(UUID responsibleId, Pageable pageable);
+    @Query("SELECT ur FROM UserResponsible ur WHERE ur.responsibleId = :responsibleId AND (:accepted IS NULL OR ur.accepted = :accepted)")
+    Page<UserResponsible> findByResponsibleIdAndAccepted(UUID responsibleId, @Param("accepted") Boolean accepted, Pageable pageable);
 }
