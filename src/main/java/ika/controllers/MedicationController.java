@@ -22,7 +22,7 @@ public class MedicationController {
     @Autowired
     private MedicationService medicationService;
 
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<String> createMedication(@Valid @RequestBody MedicationRequest medicationRequest) {
         // Aqui você chama o serviço que vai salvar a entidade no banco
         medicationService.createMedication(medicationRequest);
