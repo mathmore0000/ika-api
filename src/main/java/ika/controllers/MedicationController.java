@@ -35,7 +35,7 @@ public class MedicationController {
         System.out.println("medicationResponse -> " + medicationResponse);
         return ResponseEntity.ok(medicationResponse);
     }
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<CustomPageResponse<MedicationResponse>> getAllMedications(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "200") int size,

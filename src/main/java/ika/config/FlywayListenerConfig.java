@@ -11,15 +11,18 @@ public class FlywayListenerConfig {
 
     @Bean
     @Profile("local")
-    public FlywayMigrationStrategy cleanMigrateStrategy() {
-        FlywayMigrationStrategy strategy = new FlywayMigrationStrategy() {
-            @Override
-            public void migrate(Flyway flyway) {
-                flyway.clean();
-                flyway.migrate();
-            }
-        };
-
-        return strategy;
+//    public FlywayMigrationStrategy cleanMigrateStrategy() {
+//        FlywayMigrationStrategy strategy = new FlywayMigrationStrategy() {
+//            @Override
+//            public void migrate(Flyway flyway) {
+//                flyway.clean();
+//                flyway.migrate();
+//            }
+//        };
+//
+//        return strategy;
+//    }
+    public FlywayMigrationStrategy migrateOnlyStrategy() {
+        return Flyway::migrate;
     }
 }

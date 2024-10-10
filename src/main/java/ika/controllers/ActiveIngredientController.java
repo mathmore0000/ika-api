@@ -21,7 +21,7 @@ public class ActiveIngredientController {
     private ActiveIngredientService activeIngredientService;
 
     // Endpoint para buscar todos os ingredientes ativos com filtros e paginação
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<CustomPageResponse<ActiveIngredientResponse>> getAllActiveIngredients(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "200") int size,

@@ -26,7 +26,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryResponse);
     }
 
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<CustomPageResponse<CategoryResponse>> getAllCategories(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "200") int size,

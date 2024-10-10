@@ -30,7 +30,9 @@ CREATE TABLE auth.roles
 CREATE TABLE public.user_responsibles 
 ( 
     id_user UUID NOT NULL,  
-    id_responsible UUID NOT NULL
+    id_responsible UUID NOT NULL,
+    accepted BOOLEAN NOT NULL DEFAULT FALSE,
+    datetime TIMESTAMP DEFAULT NOW()
 ); 
 
 CREATE TABLE public.medication 

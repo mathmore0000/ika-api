@@ -19,7 +19,7 @@ public class LabelController {
     @Autowired
     private LabelService labelService;
 
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<CustomPageResponse<LabelResponse>> getAllLabels(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "200") int size,
