@@ -151,7 +151,7 @@ class MedicationControllerTest {
         medicationRequest.setTimeBetween(6);
         medicationRequest.setMaxTime(12);
 
-        mockMvc.perform(post("/v1/medications/create")
+        mockMvc.perform(post("/v1/medications")
                         .header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(medicationRequest)))
@@ -205,7 +205,7 @@ class MedicationControllerTest {
         medicationRepository.save(new Medication(UUID.randomUUID(), "Paracetamol 750mg", false, 3, 10F, activeIngredient, category, 750, 15, null, true, 24, 8));
 
         // Perform the GET request with filter and pagination
-        mockMvc.perform(get("/v1/medications/")
+        mockMvc.perform(get("/v1/medications")
                         .param("page", "0")
                         .param("size", "2")
                         .header("Authorization", "Bearer " + jwt)
@@ -216,7 +216,7 @@ class MedicationControllerTest {
                 .andExpect(jsonPath("$.content[1].name").value("Paracetamol 500mg"));
 
         // Perform the GET request for the second page
-        mockMvc.perform(get("/v1/medications/")
+        mockMvc.perform(get("/v1/medications")
                         .param("page", "1")
                         .param("size", "2")
                         .header("Authorization", "Bearer " + jwt)
