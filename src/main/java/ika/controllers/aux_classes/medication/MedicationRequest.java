@@ -22,8 +22,8 @@ public class MedicationRequest {
     @NotNull(message = "activeIngredientId is required")
     private UUID activeIngredientId;
 
-    @Min(value = 1, message = "maxTime must be greater than or equal to 1")
-    private float maxTime;
+    @Min(value = 1, message = "maxValidationTime must be greater than or equal to 1")
+    private float maxValidationTime;
 
     @Min(value = 1, message = "timeBetween must be greater than or equal to 1")
     private float timeBetween;

@@ -151,7 +151,7 @@ class MedicationControllerTest {
         medicationRequest.setCategoryId(getCategoryId("Antibiótico").getId());
         medicationRequest.setBand(3);
         medicationRequest.setTimeBetween(6);
-        medicationRequest.setMaxTime(12);
+        medicationRequest.setMaxValidationTime(12);
 
         mockMvc.perform(post("/v1/medications")
                         .header("Authorization", "Bearer " + jwt)
@@ -172,7 +172,7 @@ class MedicationControllerTest {
         medication.setActiveIngredient(getActiveIngredientId("Clopidogrel"));
         medication.setCategory(getCategoryId("Antifúngico"));
         medication.setTimeBetween(8);
-        medication.setMaxTime(24);
+        medication.setMaxValidationTime(24);
         medication = medicationRepository.save(medication);
 
         // Perform the GET request to retrieve the medication by ID
@@ -202,9 +202,59 @@ class MedicationControllerTest {
         ActiveIngredient activeIngredient = activeIngredientRepository.save(new ActiveIngredient(UUID.randomUUID(), "Paracetamol"));
 
         // Create and save multiple medications with different categories and active ingredients
-        medicationRepository.save(new Medication(UUID.randomUUID(), "Ibuprofen 400mg", false, 3, 10F, activeIngredient, category, 400, 30, null, true, 24, 8));
-        medicationRepository.save(new Medication(UUID.randomUUID(), "Paracetamol 500mg", false, 3, 10F, activeIngredient, category, 500, 20, null, true, 24, 8));
-        medicationRepository.save(new Medication(UUID.randomUUID(), "Paracetamol 750mg", false, 3, 10F, activeIngredient, category, 750, 15, null, true, 24, 8));
+        medicationRepository.save(new Medication(
+                UUID.randomUUID(),
+                "Ibuprofen 400mg",
+                false,
+                3,
+                10F,
+                activeIngredient,
+                category,
+                400,
+                30,
+                null,  // id_user, se aplicável, substitua por um valor válido
+                true,
+                24,
+                8,
+                30,   // quantityInt, porque é um medicamento sólido
+                null  // quantityMl, porque é um medicamento sólido
+        ));
+
+        medicationRepository.save(new Medication(
+                UUID.randomUUID(),
+                "Paracetamol 500mg",
+                false,
+                3,
+                10F,
+                activeIngredient,
+                category,
+                500,
+                20,
+                null,  // id_user, se aplicável, substitua por um valor válido
+                true,
+                24,
+                8,
+                20,   // quantityInt, porque é um medicamento sólido
+                null  // quantityMl, porque é um medicamento sólido
+        ));
+
+        medicationRepository.save(new Medication(
+                UUID.randomUUID(),
+                "Paracetamol 750mg",
+                false,
+                3,
+                10F,
+                activeIngredient,
+                category,
+                750,
+                15,
+                null,  // id_user, se aplicável, substitua por um valor válido
+                true,
+                24,
+                8,
+                15,   // quantityInt, porque é um medicamento sólido
+                null  // quantityMl, porque é um medicamento sólido
+        ));
 
         // Perform the GET request with filter and pagination
         mockMvc.perform(get("/v1/medications")

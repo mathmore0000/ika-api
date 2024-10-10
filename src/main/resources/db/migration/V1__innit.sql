@@ -48,7 +48,9 @@ CREATE TABLE public.medication
     quantity_card INT,  
     id_user UUID,  
     is_valid BOOLEAN NOT NULL DEFAULT FALSE,  
-    max_time FLOAT,
+    max_validation_time FLOAT,
+    quantity_int INT,
+    quantity_ml FLOAT,
     time_between FLOAT NOT NULL
 ); 
 
@@ -57,10 +59,11 @@ CREATE TABLE public.user_medication
     id_user UUID,  
     id_medication UUID,  
     disabled BOOLEAN NOT NULL DEFAULT FALSE,  
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),  
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    quantity_card INT,  
     quantity_int INT,  
-    quantity_ml FLOAT,  
-    max_time FLOAT,
+    quantity_ml FLOAT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     time_between FLOAT NOT NULL,  
     first_dosage_time TIMESTAMP NOT NULL,  
     max_validation_time FLOAT
@@ -72,7 +75,7 @@ CREATE TABLE public.user_medication_stock
     quantity_stocked INT,  
     id_user_medication UUID,  
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
-    stocked_at TIMESTAMP NOT NULL,  
+    stocked_at TIMESTAMP NOT NULL,
     quantity_card INT,  
     expiration_date DATE NOT NULL,  
     quantity_now INT

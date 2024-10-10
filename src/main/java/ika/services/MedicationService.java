@@ -53,7 +53,7 @@ public class MedicationService {
         medication.setQuantityCard(medicationRequest.getQuantityCard());
         medication.setDisabled(false);
         medication.setUser(user);
-        medication.setMaxTime(medicationRequest.getMaxTime());
+        medication.setMaxValidationTime(medicationRequest.getMaxValidationTime());
         medication.setTimeBetween(medicationRequest.getTimeBetween());
         medication.setBand(medicationRequest.getBand());
         medicationRepository.save(medication);

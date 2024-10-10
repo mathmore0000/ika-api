@@ -21,7 +21,7 @@ public class MedicationResponse {
         this.dosage = medication.getDosage();
         this.quantityCard = medication.getQuantityCard();
         this.isValid = medication.isValid();
-        this.maxTime = medication.getMaxTime();
+        this.maxValidationTime = medication.getMaxValidationTime();
         this.timeBetween = medication.getTimeBetween();
     }
     private UUID id;
@@ -44,7 +44,7 @@ public class MedicationResponse {
 
     private boolean isValid;
 
-    private float maxTime;
+    private float maxValidationTime;
 
     private float timeBetween;
 }
