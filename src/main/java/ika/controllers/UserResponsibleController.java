@@ -37,8 +37,8 @@ public class UserResponsibleController {
     }
 
     @PutMapping("/accept")
-    public ResponseEntity<UserResponsible> acceptRequest(@RequestParam UUID idResponsible) {
-        UUID idUser = currentUserProvider.getCurrentUserId();
+    public ResponseEntity<UserResponsible> acceptRequest(@RequestParam UUID idUser) {
+        UUID idResponsible = currentUserProvider.getCurrentUserId();
         Optional<UserResponsible> acceptedRequest = userResponsibleService.acceptResponsibleRequest(idResponsible, idUser);
 
         return acceptedRequest
@@ -69,7 +69,7 @@ public class UserResponsibleController {
             @RequestParam(value = "accepted", required = false) Boolean accepted,  // Use Boolean to allow null values
             @RequestParam(defaultValue = "createdAt") String sortBy,  // Sorting field
             @RequestParam(defaultValue = "asc") String sortDirection) { // Sorting direction
-        UUID idResponsible = currentUserProvider.getCurrentUserId();
+            UUID idResponsible = currentUserProvider.getCurrentUserId();
         Pageable pageable = CustomPageResponse.createPageableWithSort(page, size, sortBy, sortDirection);
         Page<UserResponsible> responsiblesPage = userResponsibleService.getAllResponsibles(idResponsible, accepted, pageable);
 
