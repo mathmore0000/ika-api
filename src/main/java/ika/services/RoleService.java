@@ -15,11 +15,6 @@ public class RoleService {
         this.roleRepository = roleRepository;
     }
 
-    // Método para buscar todos os roles
-    public Iterable<Role> findAllRoles() {
-        return roleRepository.findAll();
-    }
-
     // Método para buscar role por nome
     public Optional<Role> findRoleByName(String roleName) {
         return roleRepository.findById(roleName);
