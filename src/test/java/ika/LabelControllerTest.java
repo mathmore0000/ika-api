@@ -122,7 +122,7 @@ class LabelControllerTest {
         labelRepository.save(new Label(UUID.randomUUID(), "Tomou em pé"));
 
         // Perform the GET request to retrieve all labels
-        mockMvc.perform(get("/v1/labels/")
+        mockMvc.perform(get("/v1/labels")
                         .header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -148,7 +148,7 @@ class LabelControllerTest {
         labelRepository.save(new Label(UUID.randomUUID(), "Tomou sem supervisão"));
 
         // Perform the GET request with pagination
-        mockMvc.perform(get("/v1/labels/")
+        mockMvc.perform(get("/v1/labels")
                         .param("page", "0")
                         .param("size", "2")
                         .header("Authorization", "Bearer " + jwt)
@@ -157,7 +157,7 @@ class LabelControllerTest {
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content[0].description").value("Tomou com água"));
 
-        mockMvc.perform(get("/v1/labels/")
+        mockMvc.perform(get("/v1/labels")
                         .param("page", "1")
                         .param("size", "2")
                         .header("Authorization", "Bearer " + jwt)
