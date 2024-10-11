@@ -66,9 +66,8 @@ public class UserMedicationController {
             @PathVariable UUID userMedicationId,
             @RequestParam boolean disabled) {
         UUID userId = currentUserProvider.getCurrentUserId();
-        boolean isUpdated = userMedicationService.updateUserMedicationStatus(userId, userMedicationId, disabled);
-        return isUpdated ? ResponseEntity.ok("User medication status updated successfully")
-                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("User medication not found");
+        UserMedication updatedMedication  = userMedicationService.updateUserMedicationStatus(userId, userMedicationId, disabled);
+        return ResponseEntity.ok("User medication status updated successfully");
     }
 
     // New endpoint to update a user medication

@@ -49,10 +49,10 @@ class MedicationControllerTest {
     private MedicationRepository medicationRepository;
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private CategoryRepository categoryRepository;
 
     @Autowired
     private ActiveIngredientRepository activeIngredientRepository;

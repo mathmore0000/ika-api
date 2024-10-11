@@ -67,12 +67,12 @@ public class UserMedicationService {
     }
 
     // Method to update the 'disabled' status of a user medication
-    public boolean updateUserMedicationStatus(UUID userId, UUID userMedicationId, boolean disabled) {
+    public UserMedication updateUserMedicationStatus(UUID userId, UUID userMedicationId, boolean disabled) {
         UserMedication userMedication = userMedicationRepository.findByUserIdAndMedicationId(userId, userMedicationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Medication relation not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User medication not found"));
         userMedication.setDisabled(disabled);
         userMedicationRepository.save(userMedication);
-        return true;
+        return userMedication;
     }
 
     // Method to update a user medication with new details
