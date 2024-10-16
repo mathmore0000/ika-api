@@ -1,6 +1,7 @@
 package ika.controllers;
 
 import ika.controllers.aux_classes.CustomPageResponse;
+import ika.controllers.aux_classes.user_medication_stock.UserMedicationStockRequest;
 import ika.controllers.aux_classes.user_medication_stock.UserMedicationStockResponse;
 import ika.entities.UserMedicationStock;
 import ika.services.UserMedicationStockService;
@@ -29,12 +30,9 @@ public class UserMedicationStockController {
 
     @PostMapping
     public ResponseEntity<UserMedicationStock> createStock(
-            @RequestParam UUID userMedicationId,
-            @RequestParam int quantityStocked,
-            @RequestParam LocalDateTime expirationDate,
-            @RequestParam(required = false) Integer quantityCard) {
+            @Valid @RequestBody UserMedicationStockRequest request) {
 
-        UserMedicationStock stock = stockService.addStock(userMedicationId, quantityStocked, expirationDate, quantityCard);
+        UserMedicationStock stock = stockService.addStock(request.getUserMedicationId(), request.getQuantityStocked(), request.getExpirationDate(), request.getQuantityCard());
         return ResponseEntity.status(HttpStatus.CREATED).body(stock);
     }
 
