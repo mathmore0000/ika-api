@@ -77,8 +77,7 @@ CREATE TABLE public.user_medication_stock
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
     stocked_at TIMESTAMP NOT NULL,
     quantity_card INT,  
-    expiration_date DATE NOT NULL,  
-    quantity_now INT
+    expiration_date DATE NOT NULL
 ); 
 
 CREATE TABLE audit.logged_actions 
