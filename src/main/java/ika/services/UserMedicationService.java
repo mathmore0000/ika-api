@@ -93,8 +93,12 @@ public class UserMedicationService {
             return userMedication;
     }
 
-    public void deleteUserMedication(UUID userId, UUID medicationId) {
-        Optional<UserMedication> userMedication = userMedicationRepository.findByUserIdAndMedicationId(userId, medicationId);
-        userMedication.ifPresent(userMedicationRepository::delete);
+    public boolean deleteUserMedication(UUID userId, UUID userMedicationId) {
+        Optional<UserMedication> userMedication = userMedicationRepository.findByUserIdAndMedicationId(userId, userMedicationId);
+        if (userMedication.isPresent()) {
+            userMedicationRepository.delete(userMedication.get());
+            return true;
+        }
+        return false;
     }
 }
