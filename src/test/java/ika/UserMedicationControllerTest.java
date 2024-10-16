@@ -194,6 +194,44 @@ class UserMedicationControllerTest {
     }
 
     @Test
+    void testDeleteUserMedicationSuccess() throws Exception {
+        UUID userMedicationId = createUserMedication();
+
+        mockMvc.perform(delete("/v1/user-medications/" + userMedicationId)
+                        .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void testDeleteUserMedicationNotFound() throws Exception {
+        mockMvc.perform(delete("/v1/user-medications/" + UUID.randomUUID())
+                        .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isNotFound());
+    }
+    @Test
+    void testGetAllUserMedicationsWithPagingAndSorting() throws Exception {
+        // Create two custom user medications
+        UUID medicationId1 = createMedication("Paracetamol 500mg", "Paracetamol", "Antipirético");
+        UUID medicationId2 = createMedication("Ibuprofen 400mg", "Ibuprofen", "Anti-inflamatório");
+
+        createUserMedicationWithCustomValues(medicationId1, 5, 250.0f, 6.0f, LocalDateTime.now().minusDays(1));
+        createUserMedicationWithCustomValues(medicationId2, 10, 500.0f, 8.0f, LocalDateTime.now());
+
+        // Perform the GET request to retrieve user medications with pagination and sorting
+        mockMvc.perform(get("/v1/user-medications")
+                        .param("page", "0")
+                        .param("size", "1")  // Test with page size of 1 to ensure pagination
+                        .param("sortBy", "createdAt")
+                        .param("sortDirection", "asc")
+                        .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(1))  // Check that only 1 result is returned on page 0
+                .andExpect(jsonPath("$.totalPages").value(2))  // Check that there are 2 pages in total
+                .andExpect(jsonPath("$.content[0].medication.name").value("Paracetamol 500mg"));  // Verify first medication is Paracetamol
+    }
+
+    @Test
     void testUpdateUserMedicationSuccess() throws Exception {
         UUID userMedicationId = createUserMedication();
 
@@ -271,4 +309,27 @@ class UserMedicationControllerTest {
                 null  // quantityMl, porque é um medicamento sólido
         )).getId();
     }
+
+    private UUID createUserMedicationWithCustomValues(UUID medicationId, int quantityInt, float quantityMl, float timeBetween, LocalDateTime firstDosageTime) throws Exception {
+        UserMedicationRequest request = new UserMedicationRequest();
+        request.setIdMedication(medicationId);
+        request.setQuantityInt(quantityInt);
+        request.setQuantityMl(quantityMl);
+        request.setTimeBetween(timeBetween);
+        request.setFirstDosageTime(firstDosageTime);
+        request.setMaxValidationTime(24.0f);  // You can also pass this as a parameter if needed
+
+        // Perform the POST request to create a user medication with custom values
+        mockMvc.perform(post("/v1/user-medications")
+                        .header("Authorization", "Bearer " + jwt)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+
+        // Find the created user medication and return its ID
+        return userMedicationRepository.findByUserIdAndMedicationId(userId, medicationId)
+                .orElseThrow(() -> new RuntimeException("Failed to create user medication"))
+                .getId();
+    }
+
 }
