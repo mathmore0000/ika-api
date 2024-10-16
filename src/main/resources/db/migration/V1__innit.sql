@@ -55,11 +55,11 @@ CREATE TABLE public.medication
 ); 
 
 CREATE TABLE public.user_medication 
-( 
+(
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     id_user UUID,  
     id_medication UUID,  
-    disabled BOOLEAN NOT NULL DEFAULT FALSE,  
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    disabled BOOLEAN NOT NULL DEFAULT FALSE,
     quantity_card INT,  
     quantity_int INT,  
     quantity_ml FLOAT,

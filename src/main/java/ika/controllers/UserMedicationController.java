@@ -44,7 +44,7 @@ public class UserMedicationController {
             @RequestParam(defaultValue = "createdAt") String sortBy,  // Campo de ordenação
             @RequestParam(defaultValue = "asc") String sortDirection // Direção de ordenação
              ) {
-        UUID userId = currentUserProvider.getCurrentUser().getId();
+        UUID userId = currentUserProvider.getCurrentUserId();
         Pageable pageable = CustomPageResponse.createPageableWithSort(page, size, sortBy, sortDirection);
         Page<UserMedication> userMedicationsPage = userMedicationService.getAllUserMedications(userId, pageable);
 
