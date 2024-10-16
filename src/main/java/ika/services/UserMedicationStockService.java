@@ -63,9 +63,6 @@ public class UserMedicationStockService {
 
     public Page<UserMedicationStockResponse> getStockForUserMedicationByIdUserIdAndMedication(UUID userId, UUID medicationId, Pageable pageable) {
         Page<UserMedicationStock> stocks = stockRepository.findAllByUserIdAndMedicationId(userId, medicationId, pageable);
-        if (stocks.isEmpty()) {
-            throw new ResourceNotFoundException("No stock found for the given user and medication.");
-        }
         return stocks.map(stock -> new UserMedicationStockResponse(
                 stock.getId(),
                 stock.getQuantityStocked(),
