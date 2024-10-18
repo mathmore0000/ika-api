@@ -78,7 +78,16 @@ CREATE TABLE public.user_medication_stock
     stocked_at TIMESTAMP NOT NULL,
     quantity_card INT,  
     expiration_date DATE NOT NULL
-); 
+);
+
+CREATE TABLE public.user_medication_stock_usage
+(
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id_usage UUID,
+    id_user_medication_stock UUID,
+    quantity_int INT,
+    quantity_ml FLOAT
+);
 
 CREATE TABLE audit.logged_actions 
 ( 
@@ -106,15 +115,12 @@ CREATE TABLE public.category
     UNIQUE (description)
 ); 
 
-CREATE TABLE public.log_usage 
+CREATE TABLE public.usage
 ( 
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),  
-    id_user UUID,  
-    id_user_medication_stock UUID,  
+    id_user UUID,
     id_video_info UUID NOT NULL,  
     is_approved BOOLEAN DEFAULT FALSE,  
-    id_replacement UUID,  
-    is_valid BOOLEAN NOT NULL DEFAULT TRUE,  
     action_tmstamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ); 
 
@@ -123,17 +129,9 @@ CREATE TABLE public.labels
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),  
     description VARCHAR(100) NOT NULL,  
     UNIQUE (description)
-); 
+);
 
-CREATE TABLE public.video_info 
-( 
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),  
-    id_file UUID,  
-    observation TEXT,  
-    UNIQUE (id)
-); 
-
-CREATE TABLE public.video_info_labels 
+CREATE TABLE public.usage_labels
 ( 
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),  
     id_video_info UUID,  
@@ -206,40 +204,13 @@ ADD CONSTRAINT fk_user_medication_stock
 FOREIGN KEY (id_user_medication) 
 REFERENCES public.user_medication (id);
 
--- Add foreign key constraints to public.log_usage
-ALTER TABLE public.log_usage 
+-- Add foreign key constraints to public.usage
+ALTER TABLE public.usage
 ADD CONSTRAINT fk_user_log_usage 
 FOREIGN KEY (id_user) 
 REFERENCES auth.users (id);
 
-ALTER TABLE public.log_usage 
-ADD CONSTRAINT fk_user_medication_stock_log_usage 
-FOREIGN KEY (id_user_medication_stock) 
-REFERENCES public.user_medication_stock (id);
-
-ALTER TABLE public.log_usage 
-ADD CONSTRAINT fk_video_info 
-FOREIGN KEY (id_video_info) 
-REFERENCES public.video_info (id);
-
-ALTER TABLE public.log_usage 
-ADD CONSTRAINT fk_replacement_log_usage 
-FOREIGN KEY (id_replacement) 
-REFERENCES public.log_usage (id);
-
--- Add foreign key constraint to public.video_info
-ALTER TABLE public.video_info 
-ADD CONSTRAINT fk_file_user 
-FOREIGN KEY (id_file) 
-REFERENCES storage.files (id);
-
--- Add foreign key constraints to public.video_info_labels
-ALTER TABLE public.video_info_labels 
-ADD CONSTRAINT fk_video_info_video_info_labels 
-FOREIGN KEY (id_video_info) 
-REFERENCES public.video_info (id);
-
-ALTER TABLE public.video_info_labels 
+ALTER TABLE public.usage_labels
 ADD CONSTRAINT fk_label_video_info_labels 
 FOREIGN KEY (id_label) 
 REFERENCES public.labels (id);
@@ -249,3 +220,14 @@ ALTER TABLE storage.files
 ADD CONSTRAINT fk_bucket 
 FOREIGN KEY (id_bucket) 
 REFERENCES storage.buckets (id);
+
+-- Add foreign key constraint to public.user_medication_stock_usage
+ALTER TABLE public.user_medication_stock_usage
+ADD CONSTRAINT fk_usage
+FOREIGN KEY (id_usage)
+REFERENCES public.usage (id);
+
+ALTER TABLE public.user_medication_stock_usage
+ADD CONSTRAINT fk_user_medication_stock
+FOREIGN KEY (id_user_medication_stock)
+REFERENCES public.user_medication_stock (id);
