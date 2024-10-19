@@ -43,7 +43,7 @@ public class FileService {
     @Autowired
     private CurrentUserProvider currentUserProvider;
 
-    public void uploadFile(String bucketDescription, MultipartFile file) throws IOException, NoSuchMethodException {
+    public FileEntity uploadFile(String bucketDescription, MultipartFile file) throws Exception {
         LocalDateTime localDateTimeNow= LocalDateTime.now();
         String originalFilename = file.getOriginalFilename();
         String fileName = originalFilename + "-" + currentUserProvider.getCurrentUserId().toString()+"-"+localDateTimeNow.toString();
@@ -52,7 +52,7 @@ public class FileService {
         // Find the bucket by ID in the database
         Optional<Bucket> bucketOptional = bucketRepository.findByDescription(bucketDescription);
         if (bucketOptional.isEmpty()) {
-            throw new ResourceNotFoundException("Bucket not found in the database");
+            throw new Exception("Bucket not found in the database");
         }
 
         Bucket bucket = bucketOptional.get();  // Get bucket entity
@@ -68,14 +68,13 @@ public class FileService {
 
         // Save file metadata in the database
         FileEntity fileEntity = new FileEntity();
-        fileEntity.setId(UUID.randomUUID());
         fileEntity.setName(fileName);
         fileEntity.setCreatedAt(localDateTimeNow);
         fileEntity.setType(fileType);
         fileEntity.setBucket(bucket);  // Associate with the bucket
 
         // Save file entity in the repository (database)
-        fileRepository.save(fileEntity);
+        return fileRepository.save(fileEntity);
     }
 
     /**

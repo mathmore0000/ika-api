@@ -1,4 +1,4 @@
-package ika.controllers.aux_classes.user_medication;
+package ika.entities.aux_classes.user_medication;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;

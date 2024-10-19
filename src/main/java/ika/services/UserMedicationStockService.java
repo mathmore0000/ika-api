@@ -1,6 +1,6 @@
 package ika.services;
 
-import ika.controllers.aux_classes.user_medication_stock.UserMedicationStockResponse;
+import ika.entities.aux_classes.user_medication_stock.UserMedicationStockResponse;
 import ika.entities.UserMedication;
 import ika.entities.UserMedicationStock;
 import ika.repositories.UserMedicationRepository;
@@ -70,5 +70,11 @@ public class UserMedicationStockService {
                 stock.getStockedAt(),
                 stock.getExpirationDate()
         ));
+    }
+
+    public List<UserMedicationStock> getUserMedicationStocksByIdUserIdAndMedications(UUID userId, List<UUID> medicationIds) {
+        List<UserMedicationStock> stocks = stockRepository.findAllByUserIdAndMedicationIds(userId, medicationIds);
+
+        return stocks;
     }
 }

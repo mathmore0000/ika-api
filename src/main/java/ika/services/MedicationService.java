@@ -1,7 +1,7 @@
 package ika.services;
 
-import ika.controllers.aux_classes.medication.MedicationRequest;
-import ika.controllers.aux_classes.medication.MedicationResponse;
+import ika.entities.aux_classes.medication.MedicationRequest;
+import ika.entities.aux_classes.medication.MedicationResponse;
 import ika.entities.Medication;
 import ika.entities.User;
 import ika.repositories.MedicationRepository;
@@ -10,8 +10,6 @@ import ika.utils.exceptions.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -20,7 +18,6 @@ import java.util.UUID;
 @Service
 public class MedicationService {
 
-    private UserService userService;
     private final CurrentUserProvider currentUserProvider;
     @Autowired
     private final MedicationRepository medicationRepository;

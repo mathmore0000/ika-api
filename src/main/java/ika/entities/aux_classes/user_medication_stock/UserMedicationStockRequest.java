@@ -1,4 +1,4 @@
-package ika.controllers.aux_classes.user_medication_stock;
+package ika.entities.aux_classes.user_medication_stock;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -9,13 +9,13 @@ import java.util.UUID;
 @Data
 public class UserMedicationStockRequest {
 
-    @NotNull
+    @NotNull(message = "userMedicationId is required")
     private UUID userMedicationId;
 
-    @NotNull
-    private int quantityStocked;
+    @NotNull(message = "quantityStocked is required")
+    private Integer quantityStocked;
 
-    @NotNull
+    @NotNull(message = "expirationDate is required")
     private LocalDateTime expirationDate;
 
     private Integer quantityCard;

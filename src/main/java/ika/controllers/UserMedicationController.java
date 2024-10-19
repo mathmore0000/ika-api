@@ -1,7 +1,7 @@
 package ika.controllers;
 
-import ika.controllers.aux_classes.CustomPageResponse;
-import ika.controllers.aux_classes.user_medication.UserMedicationRequest;
+import ika.entities.aux_classes.CustomPageResponse;
+import ika.entities.aux_classes.user_medication.UserMedicationRequest;
 import ika.entities.UserMedication;
 import ika.services.UserMedicationService;
 import ika.utils.CurrentUserProvider;

@@ -1,6 +1,6 @@
 package ika.entities;
 
-import ika.controllers.aux_classes.user_medication.UserMedicationRequest;
+import ika.entities.aux_classes.user_medication.UserMedicationRequest;
 import jakarta.persistence.*;
 import lombok.Data;
 

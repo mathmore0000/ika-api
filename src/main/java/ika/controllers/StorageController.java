@@ -1,6 +1,6 @@
 package ika.controllers;
 
-import ika.controllers.aux_classes.CustomPageResponse;
+import ika.entities.aux_classes.CustomPageResponse;
 import ika.entities.Bucket;
 import ika.services.BucketService;
 import ika.services.FileService;
@@ -30,7 +30,7 @@ public class StorageController {
 
     @PostMapping("/buckets/{bucketDescription}/files")
     public ResponseEntity<String> uploadFile(@PathVariable String bucketDescription,
-                                             @RequestParam("file") MultipartFile file) throws IOException, NoSuchMethodException {
+                                             @RequestParam("file") MultipartFile file) throws Exception {
         // Use MultipartFile's InputStream instead of creating a temp file
 
         // Call the uploadFile method from the service with correct parameters

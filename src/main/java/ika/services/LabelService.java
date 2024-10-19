@@ -2,7 +2,7 @@ package ika.services;
 
 import ika.entities.Label;
 import ika.repositories.LabelRepository;
-import ika.controllers.aux_classes.label.LabelResponse;
+import ika.entities.aux_classes.label.LabelResponse;
 import ika.utils.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

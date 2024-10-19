@@ -1,8 +1,7 @@
 package ika.controllers;
 
-import ika.entities.Label;
-import ika.controllers.aux_classes.label.LabelResponse;
-import ika.controllers.aux_classes.CustomPageResponse;
+import ika.entities.aux_classes.label.LabelResponse;
+import ika.entities.aux_classes.CustomPageResponse;
 import ika.services.LabelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

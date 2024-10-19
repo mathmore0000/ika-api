@@ -1,4 +1,4 @@
-package ika.controllers.aux_classes.label;
+package ika.entities.aux_classes.label;
 
 import java.util.UUID;
 

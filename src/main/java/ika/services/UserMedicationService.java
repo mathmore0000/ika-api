@@ -1,13 +1,12 @@
 package ika.services;
 
-import ika.controllers.aux_classes.user_medication.UserMedicationRequest;
+import ika.entities.aux_classes.user_medication.UserMedicationRequest;
 import ika.entities.Medication;
 import ika.entities.User;
 import ika.entities.UserMedication;
 import ika.repositories.MedicationRepository;
 import ika.repositories.UserMedicationRepository;
 import ika.repositories.UserRepository;
-import ika.repositories.UserResponsibleRepository;
 import ika.utils.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

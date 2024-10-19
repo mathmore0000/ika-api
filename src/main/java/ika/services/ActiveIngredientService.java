@@ -1,6 +1,6 @@
 package ika.services;
 
-import ika.controllers.aux_classes.active_ingredient.ActiveIngredientResponse;
+import ika.entities.aux_classes.active_ingredient.ActiveIngredientResponse;
 import ika.entities.ActiveIngredient;
 import ika.repositories.ActiveIngredientRepository;
 import ika.utils.exceptions.ResourceNotFoundException;
@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service

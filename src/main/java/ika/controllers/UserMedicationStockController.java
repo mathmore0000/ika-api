@@ -1,8 +1,8 @@
 package ika.controllers;
 
-import ika.controllers.aux_classes.CustomPageResponse;
-import ika.controllers.aux_classes.user_medication_stock.UserMedicationStockRequest;
-import ika.controllers.aux_classes.user_medication_stock.UserMedicationStockResponse;
+import ika.entities.aux_classes.CustomPageResponse;
+import ika.entities.aux_classes.user_medication_stock.UserMedicationStockRequest;
+import ika.entities.aux_classes.user_medication_stock.UserMedicationStockResponse;
 import ika.entities.UserMedicationStock;
 import ika.services.UserMedicationStockService;
 import ika.utils.CurrentUserProvider;

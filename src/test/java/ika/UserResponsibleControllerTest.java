@@ -1,9 +1,8 @@
 package ika;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ika.controllers.aux_classes.auth.SignUpRequest;
+import ika.entities.aux_classes.auth.SignUpRequest;
 import ika.entities.User;
-import ika.entities.UserResponsible;
 import ika.repositories.UserRepository;
 import ika.repositories.UserResponsibleRepository;
 import ika.services.UserService;

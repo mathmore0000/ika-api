@@ -118,9 +118,9 @@ CREATE TABLE public.category
 CREATE TABLE public.usage
 ( 
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),  
-    id_user UUID,
-    id_video_info UUID NOT NULL,  
-    is_approved BOOLEAN DEFAULT FALSE,  
+    id_user UUID NOT NULL,
+    id_file UUID NOT NULL,
+    is_approved BOOLEAN DEFAULT NULL,
     action_tmstamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ); 
 
@@ -206,9 +206,14 @@ REFERENCES public.user_medication (id);
 
 -- Add foreign key constraints to public.usage
 ALTER TABLE public.usage
-ADD CONSTRAINT fk_user_log_usage 
+ADD CONSTRAINT fk_user_usage
 FOREIGN KEY (id_user) 
 REFERENCES auth.users (id);
+
+ALTER TABLE public.usage
+ADD CONSTRAINT fk_file_usage
+FOREIGN KEY (id_file)
+REFERENCES storage.files (id);
 
 ALTER TABLE public.usage_labels
 ADD CONSTRAINT fk_label_video_info_labels 

@@ -1,7 +1,7 @@
 package ika.controllers;
 
-import ika.controllers.aux_classes.category.CategoryResponse;
-import ika.controllers.aux_classes.CustomPageResponse;
+import ika.entities.aux_classes.category.CategoryResponse;
+import ika.entities.aux_classes.CustomPageResponse;
 import ika.entities.Category;
 import ika.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package ika.controllers.aux_classes.user_medication_stock;
+package ika.entities.aux_classes.user_medication_stock;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package ika.controllers.aux_classes.category;
+package ika.entities.aux_classes.category;
 
 import ika.entities.Category;
 

@@ -1,13 +1,11 @@
 package ika.controllers;
 
-import ika.controllers.aux_classes.CustomPageResponse;
-import ika.controllers.aux_classes.medication.MedicationRequest;
-import ika.controllers.aux_classes.medication.MedicationResponse;
+import ika.entities.aux_classes.CustomPageResponse;
+import ika.entities.aux_classes.medication.MedicationRequest;
+import ika.entities.aux_classes.medication.MedicationResponse;
 import ika.services.MedicationService;
-import ika.utils.GlobalValues;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;

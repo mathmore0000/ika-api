@@ -3,8 +3,7 @@ package ika.config;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import ika.utils.exceptions.ResourceNotFoundException;
-import io.jsonwebtoken.ExpiredJwtException;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Optional;
@@ -92,6 +92,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body("Media type not supported.");
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<String> handleMissingServletRequestPartException(MissingServletRequestPartException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("Missing part: " + ex.getRequestPartName());
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<String> handleMultipartException(MultipartException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File is required or invalid multipart request.");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

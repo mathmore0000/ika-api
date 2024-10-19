@@ -1,6 +1,6 @@
 package ika.services;
 
-import ika.controllers.aux_classes.category.CategoryResponse;
+import ika.entities.aux_classes.category.CategoryResponse;
 import ika.entities.Category;
 import ika.repositories.CategoryRepository;
 import ika.utils.exceptions.ResourceNotFoundException;

@@ -1,4 +1,4 @@
-package ika.controllers.aux_classes;
+package ika.entities.aux_classes;
 
 import ika.utils.GlobalValues;
 import org.springframework.data.domain.PageRequest;

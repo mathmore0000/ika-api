@@ -1,4 +1,4 @@
-package ika.controllers.aux_classes.auth;
+package ika.entities.aux_classes.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;

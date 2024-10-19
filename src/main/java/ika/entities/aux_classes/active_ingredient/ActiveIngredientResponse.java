@@ -1,4 +1,4 @@
-package ika.controllers.aux_classes.active_ingredient;
+package ika.entities.aux_classes.active_ingredient;
 
 import ika.entities.ActiveIngredient;
 
