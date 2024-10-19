@@ -45,8 +45,7 @@ CREATE TABLE public.medication
     id_active_ingredient UUID NOT NULL,
     id_category UUID NOT NULL,
     dosage FLOAT NOT NULL,  
-    quantity_card INT,  
-    id_user UUID,  
+    id_user UUID,
     is_valid BOOLEAN NOT NULL DEFAULT FALSE,  
     max_validation_time FLOAT,
     quantity_int INT,
@@ -60,8 +59,7 @@ CREATE TABLE public.user_medication
     id_user UUID,  
     id_medication UUID,  
     disabled BOOLEAN NOT NULL DEFAULT FALSE,
-    quantity_card INT,  
-    quantity_int INT,  
+    quantity_int INT,
     quantity_ml FLOAT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     time_between FLOAT NOT NULL,  
@@ -76,7 +74,6 @@ CREATE TABLE public.user_medication_stock
     id_user_medication UUID,  
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
     stocked_at TIMESTAMP NOT NULL,
-    quantity_card INT,  
     expiration_date DATE NOT NULL
 );
 
