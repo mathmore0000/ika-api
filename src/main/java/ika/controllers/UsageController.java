@@ -5,19 +5,24 @@ import ika.entities.aux_classes.CustomPageResponse;
 import ika.entities.aux_classes.usage.UsageRequest;
 import ika.services.UsageService;
 import ika.utils.CurrentUserProvider;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -30,11 +35,23 @@ public class UsageController {
     @Autowired
     private CurrentUserProvider currentUserProvider;
 
+    @Autowired
+    private Validator validator;
     // POST /usages: Create new medication usage with video
     @PostMapping()
     public ResponseEntity<Map<String, String>> createUsage(
             @Valid @RequestParam("file") @NotNull(message = "File is required") MultipartFile file,
-            @Valid @RequestPart UsageRequest usageRequest) throws Exception {
+            @RequestPart UsageRequest usageRequest) throws Exception {
+        Set<ConstraintViolation<UsageRequest>> violations = validator.validate(usageRequest);
+        if (!violations.isEmpty()) {
+            Map<String, String> errors = new HashMap<>();
+            for (ConstraintViolation<UsageRequest> violation : violations) {
+                String fieldName = violation.getPropertyPath().toString();
+                String errorMessage = violation.getMessage();
+                errors.put(fieldName, errorMessage);
+            }
+            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        }
 
         UUID userId = currentUserProvider.getCurrentUserId();
         Map<String, String> response = usageService.createUsage(userId, file, usageRequest);
@@ -75,10 +92,10 @@ public class UsageController {
     }
 
     // DELETE /usage/{usageId}: Delete a usage with verification of user_id
-//    @DeleteMapping("/{usageId}")
-//    public ResponseEntity<String> deleteUsage(@PathVariable UUID usageId) {
-//        UUID userId = currentUserProvider.getCurrentUserId();
-//        usageService.deleteUsage(userId, usageId);
-//        return ResponseEntity.ok("Usage deleted successfully");
-//    }
+    @DeleteMapping("/{usageId}")
+    public ResponseEntity<String> deleteUsage(@PathVariable UUID usageId) {
+        UUID userId = currentUserProvider.getCurrentUserId();
+        usageService.deleteUsage(userId, usageId);
+        return ResponseEntity.ok("Usage deleted successfully");
+    }
 }

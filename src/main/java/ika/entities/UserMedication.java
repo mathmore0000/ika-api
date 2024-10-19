@@ -46,20 +46,16 @@ public class UserMedication {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "quantity_card")
-    private Integer quantityCard;
-
     // Default constructor
     public UserMedication() {}
 
     // Constructor that sets defaults based on the medication values
-    public UserMedication(User user, Medication medication, Integer quantityInt, Float quantityMl, Integer quantityCard) {
+    public UserMedication(User user, Medication medication, Integer quantityInt, Float quantityMl) {
         this.user = user;
         this.medication = medication;
         this.timeBetween = medication.getTimeBetween();
         this.maxValidationTime = medication.getMaxValidationTime();
         this.quantityInt = quantityInt;
-        this.quantityCard = quantityCard;
         this.quantityMl = quantityMl;
     }
 
@@ -70,6 +66,5 @@ public class UserMedication {
         this.quantityMl = userMedicationDetails.getQuantityMl();
         this.timeBetween = userMedicationDetails.getTimeBetween();
         this.firstDosageTime = userMedicationDetails.getFirstDosageTime();
-        this.quantityCard = userMedicationDetails.getQuantityCard();
     }
 }

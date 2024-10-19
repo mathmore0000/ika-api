@@ -47,7 +47,6 @@ public class MedicationService {
         medication.setCategory(categoryService.findById(medicationRequest.getCategoryId()));
         medication.setActiveIngredient(activeIngredientService.findById(medicationRequest.getActiveIngredientId()));
         medication.setDosage(medicationRequest.getDosage());
-        medication.setQuantityCard(medicationRequest.getQuantityCard());
         medication.setDisabled(false);
         medication.setUser(user);
         medication.setMaxValidationTime(medicationRequest.getMaxValidationTime());

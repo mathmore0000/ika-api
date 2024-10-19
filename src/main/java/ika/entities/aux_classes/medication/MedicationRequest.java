@@ -17,8 +17,6 @@ public class MedicationRequest {
     @NotNull(message = "dosage is required")
     private float dosage;
 
-    private int quantityCard;
-
     @NotNull(message = "activeIngredientId is required")
     private UUID activeIngredientId;
 

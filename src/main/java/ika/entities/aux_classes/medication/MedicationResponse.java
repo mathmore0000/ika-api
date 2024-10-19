@@ -19,7 +19,6 @@ public class MedicationResponse {
         this.activeIngredient = medication.getActiveIngredient();
         this.category = medication.getCategory();
         this.dosage = medication.getDosage();
-        this.quantityCard = medication.getQuantityCard();
         this.isValid = medication.isValid();
         this.maxValidationTime = medication.getMaxValidationTime();
         this.timeBetween = medication.getTimeBetween();
@@ -39,8 +38,6 @@ public class MedicationResponse {
     private Category category;
 
     private float dosage;
-
-    private int quantityCard;
 
     private boolean isValid;
 

@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import ika.entities.Bucket;
+import ika.entities.Usage;
 import ika.repositories.BucketRepository;
 import ika.repositories.FileRepository;
 import ika.utils.CurrentUserProvider;
@@ -48,7 +49,9 @@ public class FileService {
         String originalFilename = file.getOriginalFilename();
         String fileName = originalFilename + "-" + currentUserProvider.getCurrentUserId().toString()+"-"+localDateTimeNow.toString();
         System.out.println(fileName);
+
         validateFileType(file);
+
         // Find the bucket by ID in the database
         Optional<Bucket> bucketOptional = bucketRepository.findByDescription(bucketDescription);
         if (bucketOptional.isEmpty()) {
@@ -58,22 +61,27 @@ public class FileService {
         Bucket bucket = bucketOptional.get();  // Get bucket entity
         String bucketName = bucket.getName();
         String fileType = file.getContentType();
+
         // Upload file to S3 bucket
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(file.getSize());
         metadata.setContentType(fileType);
-
         // Upload to S3
         s3Client.putObject(new PutObjectRequest(bucketName, fileName, file.getInputStream(), metadata));
 
         // Save file metadata in the database
+        FileEntity fileEntity = insertFile(fileName, localDateTimeNow, fileType, bucket);
+
+        // Save file entity in the repository (database)
+        return fileEntity;
+    }
+
+    private FileEntity insertFile(String fileName, LocalDateTime localDateTimeNow, String fileType, Bucket bucket) {
         FileEntity fileEntity = new FileEntity();
         fileEntity.setName(fileName);
         fileEntity.setCreatedAt(localDateTimeNow);
         fileEntity.setType(fileType);
         fileEntity.setBucket(bucket);  // Associate with the bucket
-
-        // Save file entity in the repository (database)
         return fileRepository.save(fileEntity);
     }
 
@@ -90,12 +98,15 @@ public class FileService {
         FileEntity fileEntity = fileEntityOptional.get();
         String bucketName = fileEntity.getBucket().getName();
         String fileName = fileEntity.getName();
-
-        // Delete the file from S3
-        s3Client.deleteObject(bucketName, fileName);
+        deleteFileFromS3(bucketName, fileName);
 
         // Delete the file metadata from the database
         fileRepository.delete(fileEntity);
+    }
+
+    private void deleteFileFromS3(String bucketName, String fileName){
+        // Delete the file from S3
+        s3Client.deleteObject(bucketName, fileName);
     }
 
     private void validateFileType(MultipartFile file) throws NoSuchMethodException {

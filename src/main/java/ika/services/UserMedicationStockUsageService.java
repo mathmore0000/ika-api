@@ -19,6 +19,9 @@ public class UserMedicationStockUsageService {
     private UserMedicationStockUsageRepository logUsageRepository;
 
     @Autowired
+    private UserMedicationStockUsageRepository userMedicationStockUsageRepository;
+
+    @Autowired
     private UsageRepository usageRepository;
 
     public void createMedicationLog(UUID usageId, List<UsageRequest.MedicationStockRequest> medications, List<UserMedicationStock> userMedicationStocks) {
@@ -42,5 +45,20 @@ public class UserMedicationStockUsageService {
 
             logUsageRepository.save(log);
         }
+    }
+
+    public void deleteLogsByUsageId(UUID usageId) {
+        List<UserMedicationStockUsage> logs = logUsageRepository.findByUsageId(usageId);
+        logUsageRepository.deleteAll(logs);
+    }
+
+    public float getTotalUsedMlForStock(UUID medicationStockId) {
+        // Query the repository to get the total quantity of medication (in ml) used from the stock
+        return userMedicationStockUsageRepository.sumQuantityMlByMedicationStockId(medicationStockId).orElse(0f);
+    }
+
+    public int getTotalUsedIntForStock(UUID medicationStockId) {
+        // Query the repository to get the total number of pills used from the stock
+        return userMedicationStockUsageRepository.sumQuantityIntByMedicationStockId(medicationStockId).orElse(0);
     }
 }

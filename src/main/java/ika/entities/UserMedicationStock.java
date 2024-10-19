@@ -23,9 +23,6 @@ public class UserMedicationStock {
     @Column(name = "quantity_stocked", nullable = false)
     private int quantityStocked;
 
-    @Column(name = "quantity_card")
-    private Integer quantityCard;  // Optional
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

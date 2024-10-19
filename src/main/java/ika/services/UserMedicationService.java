@@ -48,9 +48,6 @@ public class UserMedicationService {
         if (userMedicationDetails.getTimeBetween() <= 0) {
             userMedication.setTimeBetween(medication.getTimeBetween());
         }
-        if (userMedicationDetails.getQuantityCard() <= 0) {
-            userMedication.setQuantityCard(medication.getQuantityCard());
-        }
         if (userMedicationDetails.getQuantityMl() <= 0) {
             userMedication.setQuantityMl(medication.getQuantityMl());
         }
@@ -86,7 +83,6 @@ public class UserMedicationService {
             userMedication.setTimeBetween(request.getTimeBetween());
             userMedication.setFirstDosageTime(request.getFirstDosageTime());
             userMedication.setMaxValidationTime(request.getMaxValidationTime());
-            userMedication.setQuantityCard(request.getQuantityCard());
 
             userMedicationRepository.save(userMedication);
             return userMedication;

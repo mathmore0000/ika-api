@@ -211,7 +211,6 @@ class MedicationControllerTest {
                 activeIngredient,
                 category,
                 400,
-                30,
                 null,  // id_user, se aplicável, substitua por um valor válido
                 true,
                 24,
@@ -229,7 +228,6 @@ class MedicationControllerTest {
                 activeIngredient,
                 category,
                 500,
-                20,
                 null,  // id_user, se aplicável, substitua por um valor válido
                 true,
                 24,
@@ -247,7 +245,6 @@ class MedicationControllerTest {
                 activeIngredient,
                 category,
                 750,
-                15,
                 null,  // id_user, se aplicável, substitua por um valor válido
                 true,
                 24,

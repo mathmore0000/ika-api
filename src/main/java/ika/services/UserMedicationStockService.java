@@ -24,19 +24,13 @@ public class UserMedicationStockService {
     @Autowired
     private UserMedicationRepository userMedicationRepository;
 
-    public UserMedicationStock addStock(UUID userMedicationId, int quantityStocked, LocalDateTime expirationDate, Integer quantityCard) {
+    public UserMedicationStock addStock(UUID userMedicationId, int quantityStocked, LocalDateTime expirationDate) {
         UserMedication userMedication = userMedicationRepository.findById(userMedicationId)
                 .orElseThrow(() -> new ResourceNotFoundException("User medication not found"));
 
         UserMedicationStock stock = new UserMedicationStock();
         stock.setUserMedication(userMedication);
         stock.setQuantityStocked(quantityStocked);
-        if (quantityCard != null) {
-            stock.setQuantityCard(quantityCard);
-        }
-        else{
-            stock.setQuantityCard(userMedication.getQuantityCard());
-        }
         stock.setCreatedAt(LocalDateTime.now());
         stock.setStockedAt(LocalDateTime.now());
         stock.setExpirationDate(expirationDate);
@@ -44,12 +38,11 @@ public class UserMedicationStockService {
         return stockRepository.save(stock);
     }
 
-    public UserMedicationStock updateStock(UUID stockId, Integer quantityCard, LocalDateTime expirationDate) {
+    public UserMedicationStock updateStock(UUID stockId, LocalDateTime expirationDate) {
         UserMedicationStock stock = stockRepository.findById(stockId)
                 .orElseThrow(() -> new ResourceNotFoundException("Stock not found"));
 
         stock.setExpirationDate(expirationDate);
-        stock.setQuantityCard(quantityCard);
 
         return stockRepository.save(stock);
     }
@@ -66,7 +59,6 @@ public class UserMedicationStockService {
         return stocks.map(stock -> new UserMedicationStockResponse(
                 stock.getId(),
                 stock.getQuantityStocked(),
-                stock.getQuantityCard(),
                 stock.getStockedAt(),
                 stock.getExpirationDate()
         ));

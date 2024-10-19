@@ -242,7 +242,6 @@ class UserMedicationControllerTest {
         updatedRequest.setTimeBetween(12.0f);
         updatedRequest.setQuantityInt(10);
         updatedRequest.setQuantityMl(5.0f);
-        updatedRequest.setQuantityCard(30);
 
         mockMvc.perform(put("/v1/user-medications/" + userMedicationId)
                         .header("Authorization", "Bearer " + jwt)
@@ -266,7 +265,6 @@ class UserMedicationControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.maxValidationTime").value(24.0))  // Verify default value from Medication
                 .andExpect(jsonPath("$.timeBetween").value(8.0))  // Verify default value from Medication
-                .andExpect(jsonPath("$.quantityCard").value(15))  // Verify default value from Medication
                 .andExpect(jsonPath("$.quantityMl").doesNotExist())  // Verify no default for ML because it's a solid medication
                 .andExpect(jsonPath("$.quantityInt").value(15));  // Verify default value from Medication
     }
@@ -300,7 +298,6 @@ class UserMedicationControllerTest {
                 activeIngredientRepository.save(new ActiveIngredient(UUID.randomUUID(), activeIngredient)),
                 categoryRepository.save(new Category(UUID.randomUUID(), category)),
                 750,
-                15,
                 null,  // id_user, se aplicável, substitua por um valor válido
                 true,
                 24,

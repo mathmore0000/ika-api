@@ -17,6 +17,4 @@ public class UserMedicationStockRequest {
 
     @NotNull(message = "expirationDate is required")
     private LocalDateTime expirationDate;
-
-    private Integer quantityCard;
 }

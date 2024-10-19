@@ -15,8 +15,6 @@ public class UserMedicationRequest {
 
     private Integer quantityInt = 0;;
 
-    private Integer quantityCard = 0;
-
     private Float quantityMl = 0F;
 
     private float timeBetween;

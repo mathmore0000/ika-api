@@ -31,17 +31,16 @@ public class UserMedicationStockController {
     public ResponseEntity<UserMedicationStock> createStock(
             @Valid @RequestBody UserMedicationStockRequest request) {
 
-        UserMedicationStock stock = stockService.addStock(request.getUserMedicationId(), request.getQuantityStocked(), request.getExpirationDate(), request.getQuantityCard());
+        UserMedicationStock stock = stockService.addStock(request.getUserMedicationId(), request.getQuantityStocked(), request.getExpirationDate());
         return ResponseEntity.status(HttpStatus.CREATED).body(stock);
     }
 
     @PatchMapping("/{stockId}")
     public ResponseEntity<UserMedicationStock> updateStock(
             @PathVariable UUID stockId,
-            @RequestParam(required = false) Integer quantityCard,
             @RequestParam(required = false) LocalDateTime expirationDate) {
 
-        UserMedicationStock updatedStock = stockService.updateStock(stockId, quantityCard, expirationDate);
+        UserMedicationStock updatedStock = stockService.updateStock(stockId, expirationDate);
         return ResponseEntity.ok(updatedStock);
     }
 

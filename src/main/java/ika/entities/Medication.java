@@ -12,7 +12,7 @@ public class Medication {
 
     public Medication(UUID id, String name, boolean disabled, int band, Float rating,
                       ActiveIngredient activeIngredient, Category category, float dosage,
-                      Integer quantityCard, User user, boolean isValid, float maxValidationTime, float timeBetween, Integer quantityInt, Float quantityMl) {
+                      User user, boolean isValid, float maxValidationTime, float timeBetween, Integer quantityInt, Float quantityMl) {
         this.id = id;
         this.name = name;
         this.disabled = disabled;
@@ -21,7 +21,6 @@ public class Medication {
         this.activeIngredient = activeIngredient;
         this.category = category;
         this.dosage = dosage;
-        this.quantityCard = quantityCard;
         this.user = user;
         this.isValid = isValid;
         this.maxValidationTime = maxValidationTime;
@@ -60,9 +59,6 @@ public class Medication {
 
     @Column(name = "dosage", nullable = false)
     private float dosage;
-
-    @Column(name = "quantity_card")
-    private Integer quantityCard;
 
     @ManyToOne
     @JoinColumn(name = "id_user")

@@ -142,7 +142,6 @@ class UserMedicationStockControllerTest {
         request.setUserMedicationId(userMedicationId);
         request.setQuantityStocked(10);
         request.setExpirationDate(LocalDateTime.now().plusDays(30));
-        request.setQuantityCard(5);  // Optional field
 
         // Send the request as JSON
         mockMvc.perform(post("/v1/user-medication-stocks")
@@ -170,22 +169,6 @@ class UserMedicationStockControllerTest {
     }
 
     @Test
-    void testCreateUserMedicationStockWithoutQuantityCard() throws Exception {
-        UserMedicationStockRequest stockRequest = new UserMedicationStockRequest();
-        stockRequest.setUserMedicationId(userMedicationId);
-        stockRequest.setQuantityStocked(10);
-        stockRequest.setExpirationDate(LocalDateTime.now().plusDays(30));  // Set expiration date 30 days ahead
-
-        // Perform the POST request to create the stock without quantityCard
-        mockMvc.perform(post("/v1/user-medication-stocks")
-                        .header("Authorization", "Bearer " + jwt)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(stockRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.quantityCard").value(20));  // Ensure quantityCard is not in the response
-    }
-
-    @Test
     void testGetUserMedicationStockNoReturn() throws Exception {
         UUID medicationId = UUID.randomUUID();  // Use a random UUID to ensure no results
 
@@ -203,18 +186,6 @@ class UserMedicationStockControllerTest {
     }
 
     @Test
-    void testUpdateUserMedicationStockSuccess() throws Exception {
-        UUID userMedicationStockId = createUserMedicationStock(userMedicationId);
-
-        mockMvc.perform(patch("/v1/user-medication-stocks/" + userMedicationStockId)
-                        .header("Authorization", "Bearer " + jwt)
-                        .param("quantityCard", "7")
-                        .param("expirationDate", LocalDateTime.now().plusDays(60).toString()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.quantityCard").value(7));
-    }
-
-    @Test
     void testDeleteUserMedicationStockSuccess() throws Exception {
         UUID userMedicationStockId = createUserMedicationStock(userMedicationId);
 
@@ -228,7 +199,6 @@ class UserMedicationStockControllerTest {
         request.setIdMedication(medicationId);
         request.setFirstDosageTime(LocalDateTime.now());
         request.setMaxValidationTime(8.0f);
-        request.setQuantityCard(20);
 
         // Perform the POST request and capture the response
         String response = mockMvc.perform(post("/v1/user-medications")
@@ -254,7 +224,6 @@ class UserMedicationStockControllerTest {
         stockRequest.setUserMedicationId(userMedicationId);
         stockRequest.setQuantityStocked(10);
         stockRequest.setExpirationDate(LocalDateTime.now().plusDays(30)); // Set expiration date 30 days ahead
-        stockRequest.setQuantityCard(5); // Optional, can be null or set based on requirements
 
         // Perform the POST request to create the stock and capture the response
         String response = mockMvc.perform(post("/v1/user-medication-stocks")
@@ -285,7 +254,6 @@ class UserMedicationStockControllerTest {
                 activeIngredientRepository.save(new ActiveIngredient(UUID.randomUUID(), activeIngredient)),
                 categoryRepository.save(new Category(UUID.randomUUID(), category)),
                 750,
-                15,
                 null,
                 true,
                 24,
