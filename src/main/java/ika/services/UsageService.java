@@ -163,8 +163,8 @@ public class UsageService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usage not found or you are not authorized to delete it"));
 
         // Verificar se o usage está aprovado
-        if (usage.getIsApproved() != null) {
-            throw new IllegalArgumentException("Usage cannot be deleted because it has already been analyzed");
+        if (usage.getIsApproved() != null && usage.getIsApproved()) {
+            throw new IllegalArgumentException("Usage cannot be deleted because it has already been approved");
         }
 
         // Deletar os logs de uso da medicação associados

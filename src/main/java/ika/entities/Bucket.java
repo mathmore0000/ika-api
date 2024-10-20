@@ -20,5 +20,5 @@ public class Bucket {
 
     public String getName(){
         return this.description + "-" + this.id.toString();
-    }
+    };
 }
