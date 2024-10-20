@@ -246,6 +246,248 @@ class UsageControllerTest {
                 .andExpect(jsonPath("$.content").isArray());
     }
 
+    @Test
+    void testCreateUsageExceedsStock() throws Exception {
+        // Atualizar estoque para uma quantidade limitada
+        UserMedicationStock userMedicationStock = userMedicationStockRepository.findById(userMedicationStockId).orElseThrow();
+        userMedicationStock.setQuantityStocked(1); // Definindo um estoque baixo, por exemplo, apenas 1 unidade de 10 comprimidos
+        userMedicationStockRepository.save(userMedicationStock);
+        UserMedication userMedication = userMedicationRepository.findById(userMedicationId).orElseThrow();
+        userMedication.setQuantityInt(10); // Definindo uma quantidade por estoque baixo, 10 comprimidos
+        userMedicationRepository.save(userMedication);
+
+
+        // Criar um `UsageRequest` que excede a quantidade disponível
+        UsageRequest request = new UsageRequest();
+        UsageRequest.MedicationStockRequest medicationStockRequest = new UsageRequest.MedicationStockRequest();
+        medicationStockRequest.setMedicationStockId(userMedicationStockId);
+        medicationStockRequest.setQuantityInt(15); // Excedendo o estoque, só temos 10 disponíveis
+        medicationStockRequest.setQuantityMl(null);
+        request.setMedications(List.of(medicationStockRequest));
+        request.setActionTmstamp(LocalDateTime.now());
+
+        MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
+        MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
+
+        // Esperar que o servidor retorne um erro indicando que a quantidade excede o estoque
+        mockMvc.perform(multipart("/v1/usages")
+                        .file(file)
+                        .file(usageRequestPart)
+                        .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("The requested quantityInt exceeds the available stock."));
+    }
+
+    @Test
+    void testCreateUsageForSolidMedicationWithInvalidQuantity() throws Exception {
+        // Criar um `UsageRequest` para um medicamento sólido com `quantityMl`, que é inválido
+        UserMedication userMedication = userMedicationRepository.findById(userMedicationId).orElseThrow();
+        userMedication.getMedication().setQuantityInt(10); // Definir o medicamento como sólido
+        userMedication.getMedication().setQuantityMl(0f);
+        userMedicationRepository.save(userMedication);
+
+        UsageRequest request = new UsageRequest();
+        UsageRequest.MedicationStockRequest medicationStockRequest = new UsageRequest.MedicationStockRequest();
+        medicationStockRequest.setMedicationStockId(userMedicationStockId);
+        medicationStockRequest.setQuantityInt(0);
+        medicationStockRequest.setQuantityMl(5.0f); // Passando quantidade ml para um medicamento sólido
+        request.setMedications(List.of(medicationStockRequest));
+        request.setActionTmstamp(LocalDateTime.now());
+
+        MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
+        MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
+
+        // Esperar que o servidor retorne um erro indicando que a quantidade está incorreta
+        mockMvc.perform(multipart("/v1/usages")
+                        .file(file)
+                        .file(usageRequestPart)
+                        .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("The quantityInt must be greater than 0 for solid medications."));
+    }
+
+    @Test
+    void testCreateUsageForLiquidMedicationWithInvalidQuantity() throws Exception {
+        // Criar um `UsageRequest` para um medicamento líquido com uma quantidade inválida
+        UserMedication userMedication = userMedicationRepository.findById(userMedicationId).orElseThrow();
+        userMedication.getMedication().setQuantityInt(0);
+        userMedication.getMedication().setQuantityMl(10.0f); // Definir o medicamento como líquido
+        medicationRepository.save(userMedication.getMedication());
+
+        UsageRequest request = new UsageRequest();
+        UsageRequest.MedicationStockRequest medicationStockRequest = new UsageRequest.MedicationStockRequest();
+        medicationStockRequest.setMedicationStockId(userMedicationStockId);
+        medicationStockRequest.setQuantityInt(null);
+        medicationStockRequest.setQuantityMl(-5.0f); // Passando quantidade ml negativa
+        request.setMedications(List.of(medicationStockRequest));
+        request.setActionTmstamp(LocalDateTime.now());
+
+        MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
+        MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
+
+        // Esperar que o servidor retorne um erro indicando que a quantidade não pode ser negativa
+        mockMvc.perform(multipart("/v1/usages")
+                        .file(file)
+                        .file(usageRequestPart)
+                        .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("The quantityMl must be greater than 0 for liquid medications."));
+    }
+
+    @Test
+    void testCreateUsageWithQuantityIntExceedingStock() throws Exception {
+        // Configurar dados do request
+        UsageRequest request = new UsageRequest();
+        UsageRequest.MedicationStockRequest medicationStockRequest = new UsageRequest.MedicationStockRequest();
+        medicationStockRequest.setMedicationStockId(userMedicationStockId);
+        medicationStockRequest.setQuantityInt(1000); // Excedendo o estoque disponível
+        request.setMedications(List.of(medicationStockRequest));
+        request.setActionTmstamp(LocalDateTime.now());
+
+        // Configurar os arquivos do mock
+        MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
+        MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
+
+        // Performar o request e verificar a resposta
+        mockMvc.perform(multipart("/v1/usages")
+                        .file(file)
+                        .file(usageRequestPart)
+                        .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("The requested quantityInt exceeds the available stock."));
+    }
+
+    @Test
+    void testCreateUsageWithQuantityMlExceedingStock() throws Exception {
+        UserMedication userMedication = userMedicationRepository.findById(userMedicationId).orElseThrow();
+        userMedication.getMedication().setQuantityInt(0);
+        userMedication.getMedication().setQuantityMl(10f);
+        userMedication.setQuantityMl(10f);
+        medicationRepository.save(userMedication.getMedication());
+        userMedicationRepository.save(userMedication);
+
+        // Configurar dados do request
+        UsageRequest request = new UsageRequest();
+        UsageRequest.MedicationStockRequest medicationStockRequest = new UsageRequest.MedicationStockRequest();
+        medicationStockRequest.setMedicationStockId(userMedicationStockId);
+        medicationStockRequest.setQuantityMl(1000f); // Excedendo o estoque disponível
+        request.setMedications(List.of(medicationStockRequest));
+        request.setActionTmstamp(LocalDateTime.now());
+
+        // Configurar os arquivos do mock
+        MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
+        MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
+
+        // Performar o request e verificar a resposta
+        mockMvc.perform(multipart("/v1/usages")
+                        .file(file)
+                        .file(usageRequestPart)
+                        .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("The requested quantityMl exceeds the available stock."));
+    }
+
+    @Test
+    void testCreateUsageWithInvalidQuantityInt() throws Exception {
+        // Configurar dados do request
+        UsageRequest request = new UsageRequest();
+        UsageRequest.MedicationStockRequest medicationStockRequest = new UsageRequest.MedicationStockRequest();
+        medicationStockRequest.setMedicationStockId(userMedicationStockId);
+        medicationStockRequest.setQuantityInt(-1); // Valor inválido para quantidade int
+        request.setMedications(List.of(medicationStockRequest));
+        request.setActionTmstamp(LocalDateTime.now());
+
+        // Configurar os arquivos do mock
+        MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
+        MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
+
+        // Performar o request e verificar a resposta
+        mockMvc.perform(multipart("/v1/usages")
+                        .file(file)
+                        .file(usageRequestPart)
+                        .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("The quantityInt must be greater than 0 for solid medications."));
+    }
+
+    @Test
+    void testCreateUsageWithInvalidSolitMedication() throws Exception {
+        // Configurar dados do request
+        UsageRequest request = new UsageRequest();
+        UsageRequest.MedicationStockRequest medicationStockRequest = new UsageRequest.MedicationStockRequest();
+        medicationStockRequest.setMedicationStockId(userMedicationStockId);
+        request.setMedications(List.of(medicationStockRequest));
+        request.setActionTmstamp(LocalDateTime.now());
+
+        UserMedication userMedication = userMedicationRepository.findById(userMedicationId).orElseThrow();
+        userMedication.getMedication().setQuantityInt(-10);
+        userMedication.getMedication().setQuantityMl(0f);
+        medicationRepository.save(userMedication.getMedication());
+
+        // Configurar os arquivos do mock
+        MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
+        MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
+
+        // Performar o request e verificar a resposta
+        mockMvc.perform(multipart("/v1/usages")
+                        .file(file)
+                        .file(usageRequestPart)
+                        .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("No valid quantity defined for this medication."));
+    }
+
+    @Test
+    void testCreateUsageWithInvalidLiquidMedication() throws Exception {
+        // Configurar dados do request
+        UsageRequest request = new UsageRequest();
+        UsageRequest.MedicationStockRequest medicationStockRequest = new UsageRequest.MedicationStockRequest();
+        medicationStockRequest.setMedicationStockId(userMedicationStockId);
+        request.setMedications(List.of(medicationStockRequest));
+        request.setActionTmstamp(LocalDateTime.now());
+
+        UserMedication userMedication = userMedicationRepository.findById(userMedicationId).orElseThrow();
+        userMedication.getMedication().setQuantityInt(0);
+        userMedication.getMedication().setQuantityMl(-10f);
+        userMedication.setQuantityInt(0);
+        userMedication.setQuantityMl(-10f);
+        medicationRepository.save(userMedication.getMedication());
+        userMedicationRepository.save(userMedication);
+
+        // Configurar os arquivos do mock
+        MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
+        MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
+
+        // Performar o request e verificar a resposta
+        mockMvc.perform(multipart("/v1/usages")
+                        .file(file)
+                        .file(usageRequestPart)
+                        .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("No valid quantity defined for this medication."));
+    }
+
+    @Test
+    void testCreateUsageValidationErrorOnUsageRequest() throws Exception {
+        // Configurar dados inválidos do request
+        UsageRequest request = new UsageRequest();
+        request.setMedications(null); // Deve falhar porque medicamentos são obrigatórios
+        request.setActionTmstamp(null); // Deve falhar porque a data é obrigatória
+
+        // Configurar os arquivos do mock
+        MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
+        MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
+
+        // Performar o request e verificar a resposta
+        mockMvc.perform(multipart("/v1/usages")
+                        .file(file)
+                        .file(usageRequestPart)
+                        .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.actionTmstamp").value("Action timestamp is required"))
+                .andExpect(jsonPath("$.medications").value("Medications are required"));
+    }
+
     private UUID createUsage() throws Exception {
         UsageRequest request = new UsageRequest();
 
@@ -282,10 +524,9 @@ class UsageControllerTest {
 
     // Helper para criar um usage aprovado
     private UUID createApprovedUsage() throws Exception {
-        Usage usage = new Usage();
-        usage.setId(UUID.randomUUID());
+        UUID usageId = createUsage();
+        Usage usage = usageRepository.findById(usageId).get();
         usage.setIsApproved(true);
-        // Preencher outros campos do Usage
         return usageRepository.save(usage).getId();
     }
 

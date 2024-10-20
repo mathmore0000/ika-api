@@ -130,8 +130,6 @@ public class UsageService {
             if (quantityInt != null && quantityInt > remainingInt) {
                 throw new IllegalArgumentException("The requested quantityInt exceeds the available stock.");
             }
-        } else {
-            throw new IllegalArgumentException("No valid quantity defined for this medication.");
         }
     }
 
@@ -139,16 +137,16 @@ public class UsageService {
         if (userMedication.getMedication().getQuantityMl() != null && userMedication.getMedication().getQuantityMl() > 0) {
             // Validar quantidade em ml
             if (quantityMl == null || quantityMl <= 0) {
-                throw new MethodArgumentTypeMismatchException(quantityMl, Float.class, "quantityMl", null, new IllegalArgumentException("The quantityMl must be greater than 0 for liquid medications."));
+                throw new IllegalArgumentException("The quantityMl must be greater than 0 for liquid medications.");
             }
         } else if (userMedication.getMedication().getQuantityInt() != null && userMedication.getMedication().getQuantityInt() > 0) {
             // Validar quantidade em int (comprimidos)
             if (quantityInt == null || quantityInt <= 0) {
-                throw new MethodArgumentTypeMismatchException(quantityInt, Integer.class, "quantityInt", null, new IllegalArgumentException("The quantityInt must be greater than 0 for solid medications."));
+                throw new IllegalArgumentException("The quantityInt must be greater than 0 for solid medications.");
             }
         } else {
             // Caso nenhum dos valores seja aplicável
-            throw new MethodArgumentTypeMismatchException(null, Object.class, "quantityMl or quantityInt", null, new IllegalArgumentException("No valid quantity defined for this medication."));
+            throw new IllegalArgumentException("No valid quantity defined for this medication.");
         }
     }
 

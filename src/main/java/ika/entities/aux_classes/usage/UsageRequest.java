@@ -1,9 +1,11 @@
 package ika.entities.aux_classes.usage;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +23,7 @@ public class UsageRequest {
     private List<MedicationStockRequest> medications;
 
     @Data
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class MedicationStockRequest {
 
         @NotNull(message = "MedicationStockId is required")
