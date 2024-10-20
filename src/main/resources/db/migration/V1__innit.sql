@@ -1,5 +1,4 @@
 CREATE SCHEMA IF NOT EXISTS auth;
-CREATE SCHEMA IF NOT EXISTS audit;
 CREATE SCHEMA IF NOT EXISTS storage;
 CREATE SCHEMA IF NOT EXISTS public;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -85,18 +84,6 @@ CREATE TABLE public.user_medication_stock_usage
     quantity_int INT,
     quantity_ml FLOAT
 );
-
-CREATE TABLE audit.logged_actions 
-( 
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),  
-    action CHAR(1) NOT NULL,  
-    schema_name VARCHAR(50) NOT NULL,
-    table_name VARCHAR(50) NOT NULL,
-    action_tmstamp TIMESTAMP NOT NULL,  
-    "user" JSONB,
-    row_data JSONB NOT NULL,  
-    changed_fields JSONB
-); 
 
 CREATE TABLE public.active_ingredient 
 ( 
