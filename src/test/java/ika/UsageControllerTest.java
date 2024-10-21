@@ -173,6 +173,86 @@ class UsageControllerTest {
     }
 
     @Test
+    void testGetFilteredUsagesByUserSuccess() throws Exception {
+        // Criar uma `Usage` válida
+        UUID usageId = createUsage();  // Você pode reutilizar seu método de criação de Usage
+
+        // Realizar uma requisição GET ao endpoint /user
+        mockMvc.perform(get("/v1/usages/user")
+                        .header("Authorization", "Bearer " + jwt)
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("fromDate", LocalDateTime.now().minusDays(1).toString())
+                        .param("toDate", LocalDateTime.now().toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(usageId.toString()))
+                .andExpect(jsonPath("$.content[0].isApproved").doesNotExist())
+                .andExpect(jsonPath("$.content[0].actionTmstamp").exists());
+    }
+
+    @Test
+    void testGetFilteredUsagesByUserPaginationAndSorting() throws Exception {
+        // Criar várias `Usage` para testar a paginação e ordenação
+        createUsage();
+        createUsage();
+        createUsage();  // Criar 3 usos para verificar a paginação
+
+        mockMvc.perform(get("/v1/usages/user")
+                        .header("Authorization", "Bearer " + jwt)
+                        .param("page", "0")
+                        .param("size", "2")  // Paginando com tamanho de 2 por página
+                        .param("sortBy", "actionTmstamp")
+                        .param("sortDirection", "asc")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalPages").value(2));  // Espera 2 páginas de resultados
+    }
+
+    @Test
+    void testGetFilteredUsagesByResponsibleSuccess() throws Exception {
+        // Criar um responsável para o usuário
+        createResponsibleForUser(userId);
+
+        // Criar uma `Usage` válida
+        UUID usageId = createUsage();
+
+        // Realizar uma requisição GET ao endpoint /responsible
+        mockMvc.perform(get("/v1/usages/responsible")
+                        .header("Authorization", "Bearer " + jwt)
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("fromDate", LocalDateTime.now().minusDays(1).toString())
+                        .param("toDate", LocalDateTime.now().toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(usageId.toString()))
+                .andExpect(jsonPath("$.content[0].actionTmstamp").exists());
+    }
+
+    @Test
+    void testGetFilteredUsagesByResponsiblePaginationAndSorting() throws Exception {
+        // Criar um responsável para o usuário
+        createResponsibleForUser(userId);
+
+        // Criar várias `Usage` para testar a paginação e ordenação
+        createUsage();
+        createUsage();
+        createUsage();  // Criar 3 usos para verificar a paginação
+
+        mockMvc.perform(get("/v1/usages/responsible")
+                        .header("Authorization", "Bearer " + jwt)
+                        .param("page", "0")
+                        .param("size", "2")  // Paginando com tamanho de 2 por página
+                        .param("sortBy", "actionTmstamp")
+                        .param("sortDirection", "asc")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalPages").value(2));  // Espera 2 páginas de resultados
+    }
+
+
+    @Test
     void testCreateUsageSuccess() throws Exception {
         UsageRequest request = new UsageRequest();
 
@@ -509,18 +589,6 @@ class UsageControllerTest {
                 .andExpect(content().string("Usage cannot be deleted because it has already been approved"));
     }
 
-    @Test
-    void testGetFilteredUsages() throws Exception {
-        createUsage(); // Criar alguns usos
-
-        // Fazer uma requisição GET com filtros específicos
-        mockMvc.perform(get("/v1/usages")
-                        .param("page", "0")
-                        .param("size", "10")
-                        .header("Authorization", "Bearer " + jwt))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray());
-    }
 
     @Test
     void testApproveUsageSuccess() throws Exception {
