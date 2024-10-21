@@ -4,6 +4,7 @@ import ika.entities.Usage;
 import ika.entities.aux_classes.CustomPageResponse;
 import ika.entities.aux_classes.usage.ApproveRejectUsageRequest;
 import ika.entities.aux_classes.usage.UsageRequest;
+import ika.entities.aux_classes.usage.UsageResponse;
 import ika.services.UsageService;
 import ika.utils.CurrentUserProvider;
 import jakarta.validation.ConstraintViolation;
@@ -60,7 +61,7 @@ public class UsageController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<CustomPageResponse<Usage>> getFilteredUsagesByResponsible(
+    public ResponseEntity<CustomPageResponse<UsageResponse>> getFilteredUsagesByUser(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(value = "isApproved", required = false) Boolean isApproved,
@@ -69,6 +70,7 @@ public class UsageController {
             @RequestParam(defaultValue = "actionTmstamp") String sortBy,  // Campo de ordenação, por padrão "actionTmstamp"
             @RequestParam(defaultValue = "asc") String sortDirection // Direção de ordenação, por padrão "asc"
     ) {
+        UUID userId = currentUserProvider.getCurrentUserId();
         // Valida e ajusta os parâmetros de paginação, se necessário
         page = CustomPageResponse.getValidPage(page);
         size = CustomPageResponse.getValidSize(size);
@@ -77,10 +79,10 @@ public class UsageController {
         Pageable pageable = CustomPageResponse.createPageableWithSort(page, size, sortBy, sortDirection);
 
         // Chama o serviço passando os filtros e a paginação
-        Page<Usage> usagePage = usageService.getFilteredUsages(isApproved, fromDate, toDate, pageable);
+        Page<UsageResponse> usagePage = usageService.getFilteredUsagesByUser(userId, isApproved, fromDate, toDate, pageable);
 
         // Cria a resposta customizada para retornar
-        CustomPageResponse<Usage> customPageResponse = new CustomPageResponse<>(
+        CustomPageResponse<UsageResponse> customPageResponse = new CustomPageResponse<>(
                 usagePage.getContent(),
                 usagePage.getNumber(),
                 usagePage.getSize(),
@@ -93,7 +95,7 @@ public class UsageController {
     }
 
     @GetMapping("/responsible")
-    public ResponseEntity<CustomPageResponse<Usage>> getFilteredUsagesByUser(
+    public ResponseEntity<CustomPageResponse<UsageResponse>> getFilteredUsagesByResponsible(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(value = "isApproved", required = false) Boolean isApproved,
@@ -102,6 +104,7 @@ public class UsageController {
             @RequestParam(defaultValue = "actionTmstamp") String sortBy,  // Campo de ordenação, por padrão "actionTmstamp"
             @RequestParam(defaultValue = "asc") String sortDirection // Direção de ordenação, por padrão "asc"
     ) {
+        UUID responsibleId = currentUserProvider.getCurrentUserId();
         // Valida e ajusta os parâmetros de paginação, se necessário
         page = CustomPageResponse.getValidPage(page);
         size = CustomPageResponse.getValidSize(size);
@@ -110,10 +113,10 @@ public class UsageController {
         Pageable pageable = CustomPageResponse.createPageableWithSort(page, size, sortBy, sortDirection);
 
         // Chama o serviço passando os filtros e a paginação
-        Page<Usage> usagePage = usageService.getFilteredUsages(isApproved, fromDate, toDate, pageable);
+        Page<UsageResponse> usagePage = usageService.getFilteredUsagesByResponsible(responsibleId, isApproved, fromDate, toDate, pageable);
 
         // Cria a resposta customizada para retornar
-        CustomPageResponse<Usage> customPageResponse = new CustomPageResponse<>(
+        CustomPageResponse<UsageResponse> customPageResponse = new CustomPageResponse<>(
                 usagePage.getContent(),
                 usagePage.getNumber(),
                 usagePage.getSize(),

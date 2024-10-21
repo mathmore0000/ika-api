@@ -1,8 +1,10 @@
 package ika.services;
 
 import ika.entities.*;
+import ika.entities.aux_classes.medication.MedicationResponse;
 import ika.entities.aux_classes.usage.ApproveRejectUsageRequest;
 import ika.entities.aux_classes.usage.UsageRequest;
+import ika.entities.aux_classes.usage.UsageResponse;
 import ika.repositories.LabelRepository;
 import ika.repositories.UsageLabelsRepository;
 import ika.repositories.UsageRepository;
@@ -88,7 +90,6 @@ public class UsageService {
         );
     }
 
-    @Transactional
     public void updateUsage(UUID usageId, ApproveRejectUsageRequest request, boolean isApproved) throws Exception {
         Optional<Usage> usageOptional = usageRepository.findById(usageId);
         if (usageOptional.isEmpty()) {
@@ -200,9 +201,14 @@ public class UsageService {
         }
     }
 
-    public Page<Usage> getFilteredUsages(Boolean isApproved, LocalDateTime fromDate, LocalDateTime toDate, Pageable pageable) {
+    public Page<UsageResponse> getFilteredUsagesByUser(UUID userId, Boolean isApproved, LocalDateTime fromDate, LocalDateTime toDate, Pageable pageable) {
         // O repositório fará a filtragem com base nos parâmetros e na paginação
-        return usageRepository.findAllWithFilters(isApproved, fromDate, toDate, pageable);
+        return usageRepository.findAllWithFiltersByUserId(userId, isApproved, fromDate, toDate, pageable).map(this::convertToUsageResponse);
+    }
+
+    public Page<UsageResponse> getFilteredUsagesByResponsible(UUID responsibled, Boolean isApproved, LocalDateTime fromDate, LocalDateTime toDate, Pageable pageable) {
+        // O repositório fará a filtragem com base nos parâmetros e na paginação
+        return usageRepository.findAllWithFiltersByResponsibleId(responsibled, isApproved, fromDate, toDate, pageable).map(this::convertToUsageResponse);
     }
 
     @Transactional
@@ -228,6 +234,9 @@ public class UsageService {
         if (usage.getVideo() != null) {
             fileService.deleteFile(usage.getVideo().getId());  // Deletar o registro na base
         }
+    }
+    private UsageResponse convertToUsageResponse(Usage usage) {
+        return new UsageResponse(usage);
     }
 
 }

@@ -1,6 +1,5 @@
 package ika;
 
-import com.amazonaws.services.lightsail.model.CreateBucketRequest;
 import com.amazonaws.services.s3.AmazonS3;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ika.entities.*;
@@ -12,7 +11,6 @@ import ika.entities.aux_classes.user_medication_stock.UserMedicationStockRequest
 import ika.repositories.*;
 import ika.services.UserService;
 import ika.utils.JwtUtil;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,12 +20,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.multipart.MultipartFile;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
@@ -37,7 +33,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -123,13 +118,12 @@ class UsageControllerTest {
         postgres.start();
     }
 
-    @Transactional
     @BeforeEach
     void initialize() throws Exception {
         // Implementação da criação de usuário, obtenção de JWT, etc.
         jwt = getJwtFromUser();
-        usageLabelsRepository.deleteAll();
-        labelRepository.deleteAll();
+        userResponsibleRepository.deleteAll();
+        usageLabelsRepository.deleteAllInBatch();
         userMedicationStockUsageRepository.deleteAll();
         usageRepository.deleteAll();
         fileRepository.deleteAll();
@@ -202,6 +196,29 @@ class UsageControllerTest {
                 .andExpect(jsonPath("$.message").value("Usage created successfully"));
     }
 
+    @Test
+    void testCreateUsageWithWrongMedication() throws Exception {
+        UsageRequest request = new UsageRequest();
+
+        // Setting up valid data for medications in usageRequest
+        UsageRequest.MedicationStockRequest medicationStockRequest = new UsageRequest.MedicationStockRequest();
+        medicationStockRequest.setMedicationStockId(UUID.randomUUID());
+        medicationStockRequest.setQuantityInt(2);
+        medicationStockRequest.setQuantityMl(null);
+
+        request.setMedications(List.of(medicationStockRequest));
+        request.setActionTmstamp(LocalDateTime.now());
+
+        MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
+        MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
+
+        mockMvc.perform(multipart("/v1/usages")
+                        .file(file)
+                        .file(usageRequestPart)  // Adding `usageRequest` JSON part
+                        .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Some medications could not be found for the user"));
+    }
 
     @Test
     void testCreateUsageMissingUsageRequest() throws Exception {
@@ -225,20 +242,16 @@ class UsageControllerTest {
     @Test
     void testDeleteUsageSuccess() throws Exception {
         // Primeiro criar um Usage
-        System.out.println("1");
         UUID usageId = createUsage();
 
         // Deletar o usage criado
-        System.out.println("2");
         mockMvc.perform(delete("/v1/usages/" + usageId)
                         .header("Authorization", "Bearer " + jwt))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Usage deleted successfully"));
 
         // Confirmar que o usage não existe mais
-        System.out.println("3");
         Optional<Usage> deletedUsage = usageRepository.findById(usageId);
-        System.out.println("4");
         assert deletedUsage.isEmpty();
     }
 
@@ -510,6 +523,105 @@ class UsageControllerTest {
     }
 
     @Test
+    void testApproveUsageSuccess() throws Exception {
+        createResponsibleForUser(userId);
+        // Criar um Usage
+        UUID usageId = createUsage();
+        UUID labelId = createLabel("Tomou em pé");
+
+        // Não criar o responsável, para que o teste falhe
+        ApproveRejectUsageRequest approveRequest = new ApproveRejectUsageRequest();
+        approveRequest.setLabels(List.of(labelId));  // Adicionar a label criada
+        approveRequest.setObs("Aprovado");
+
+        // Tentar aprovar o Usage sem ser responsável
+        mockMvc.perform(post("/v1/usages/" + usageId + "/approve")
+                        .header("Authorization", "Bearer " + jwt)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(approveRequest)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Usage approved successfully."));
+    }
+
+    @Test
+    void testApproveUsageInvalidLabel() throws Exception {
+        createResponsibleForUser(userId);
+        // Criar um Usage
+        UUID usageId = createUsage();
+
+        // Não criar o responsável, para que o teste falhe
+        ApproveRejectUsageRequest approveRequest = new ApproveRejectUsageRequest();
+        approveRequest.setLabels(List.of(UUID.randomUUID()));  // Adicionar a label criada
+        approveRequest.setObs("Aprovado");
+
+        // Tentar aprovar o Usage sem ser responsável
+        mockMvc.perform(post("/v1/usages/" + usageId + "/approve")
+                        .header("Authorization", "Bearer " + jwt)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(approveRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Some labels could not be found."));
+    }
+
+    @Test
+    void testReproveUsageInvalidLabel() throws Exception {
+        createResponsibleForUser(userId);
+        // Criar um Usage
+        UUID usageId = createUsage();
+
+        // Não criar o responsável, para que o teste falhe
+        ApproveRejectUsageRequest approveRequest = new ApproveRejectUsageRequest();
+        approveRequest.setLabels(List.of(UUID.randomUUID()));  // Adicionar a label criada
+        approveRequest.setObs("Aprovado");
+
+        // Tentar aprovar o Usage sem ser responsável
+        mockMvc.perform(post("/v1/usages/" + usageId + "/reject")
+                        .header("Authorization", "Bearer " + jwt)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(approveRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Some labels could not be found."));
+    }
+
+    @Test
+    void testApproveUsageInvalidUsage() throws Exception {
+        // Criar uma label e salvar no banco
+        UUID labelId = createLabel("Tomou em pé");
+
+        // Não criar o responsável, para que o teste falhe
+        ApproveRejectUsageRequest approveRequest = new ApproveRejectUsageRequest();
+        approveRequest.setLabels(List.of(labelId));  // Adicionar a label criada
+        approveRequest.setObs("Aprovado");
+
+        // Tentar aprovar o Usage sem ser responsável
+        mockMvc.perform(post("/v1/usages/" + UUID.randomUUID() + "/approve")
+                        .header("Authorization", "Bearer " + jwt)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(approveRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Usage not found."));
+    }
+
+    @Test
+    void testReproveUsageInvalidUsage() throws Exception {
+        // Criar uma label e salvar no banco
+        UUID labelId = createLabel("Tomou em pé");
+
+        // Não criar o responsável, para que o teste falhe
+        ApproveRejectUsageRequest approveRequest = new ApproveRejectUsageRequest();
+        approveRequest.setLabels(List.of(labelId));  // Adicionar a label criada
+        approveRequest.setObs("Rejeitado");
+
+        // Tentar aprovar o Usage sem ser responsável
+        mockMvc.perform(post("/v1/usages/" + UUID.randomUUID() + "/reject")
+                        .header("Authorization", "Bearer " + jwt)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(approveRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Usage not found."));
+    }
+
+    @Test
     void testApproveUsageNotResponsible() throws Exception {
         // Criar um Usage
         UUID usageId = createUsage();
@@ -553,11 +665,19 @@ class UsageControllerTest {
                 .andExpect(content().string("You are not responsible by this usage."));
     }
 
+    @Test
+    void testRejectUsageSuccess() throws Exception {
+    }
+
     private UUID createLabel(String labelDescription) {
-        Label label = new Label();
-        label.setId(UUID.randomUUID());
-        label.setDescription(labelDescription);
-        return labelRepository.save(label).getId();
+        Optional<Label> existingLabel = labelRepository.findByDescription(labelDescription);
+        if (existingLabel.isEmpty()) {
+            Label label = new Label();
+            label.setId(UUID.randomUUID());
+            label.setDescription(labelDescription);
+            return labelRepository.save(label).getId();
+        }
+        return existingLabel.get().getId();
     }
 
     private void createResponsibleForUser(UUID userId) {

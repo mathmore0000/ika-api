@@ -38,6 +38,6 @@ public class Usage {
     private Set<Label> labels = new HashSet<>();
 
     @OneToMany(mappedBy = "usage", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserMedicationStockUsage> stockUsages;  // Assuming you have a mappedBy in UserMedicationStockUsage
+    private List<UserMedicationStockUsage> userMedicationStockUsages;  // Assuming you have a mappedBy in UserMedicationStockUsage
 }
 

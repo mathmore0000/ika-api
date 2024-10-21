@@ -2,14 +2,12 @@ package ika.entities.aux_classes.usage;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
 import java.util.UUID;
 
-@Setter
-@Getter
+@Data
 public class ApproveRejectUsageRequest {
     // Getters and Setters
     private String obs;
