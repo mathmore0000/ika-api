@@ -6,6 +6,8 @@ import ika.entities.aux_classes.usage.UsageRequest;
 import ika.repositories.LabelRepository;
 import ika.repositories.UsageLabelsRepository;
 import ika.repositories.UsageRepository;
+import ika.repositories.UserResponsibleRepository;
+import ika.utils.CurrentUserProvider;
 import ika.utils.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,12 @@ public class UsageService {
 
     @Autowired
     private UsageLabelsRepository usageLabelsRepository;
+
+    @Autowired
+    private CurrentUserProvider currentUserProvider;
+
+    @Autowired
+    private UserResponsibleRepository userResponsibleRepository;
 
     @Autowired
     private LabelRepository labelRepository;
@@ -86,26 +94,36 @@ public class UsageService {
         if (usageOptional.isEmpty()) {
             throw new ResourceNotFoundException("Usage not found.");
         }
+
         Usage usage = usageOptional.get();
+        UUID responsibleId = currentUserProvider.getCurrentUserId();
+
+        if (!userResponsibleRepository.existsByResponsibleIdAndUserIdAndAccepted(usage.getUserId(), responsibleId)){
+            throw new ResourceNotFoundException("You are not responsible by this usage.");
+        }
+
         usage.setIsApproved(isApproved);
         usage.setObs(request.getObs());
 
-        // Add labels if they do not exist
-        Set<Label> newLabels = new HashSet<>(Set.of());
-        for (UUID labelId : request.getLabels()) {
-            Label label = labelRepository.findById(labelId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Some labels could not be found."));
-            newLabels.add(label);
-        }
-        usage.setLabels(newLabels);
+        // Remover as associações antigas de UsageLabels
         List<UUID> usageLabelIds = usageLabelsRepository.findByUsage_Id(usageId).stream()
                 .map(UsageLabels::getId)
                 .collect(Collectors.toList());
-        System.out.println(usageLabelIds);
-        usageLabelsRepository.deleteAllById(usageLabelIds);
-        usageRepository.save(usage);
-    }
 
+        // Criar novas associações de UsageLabels
+        Set<UsageLabels> newUsageLabels = new HashSet<>();
+        for (UUID labelId : request.getLabels()) {
+            Label label = labelRepository.findById(labelId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Some labels could not be found."));
+            UsageLabels usageLabel = new UsageLabels(UUID.randomUUID(), label, usage);  // Criar novo UsageLabels
+            newUsageLabels.add(usageLabel);
+        }
+
+        usageLabelsRepository.deleteAllById(usageLabelIds);
+        usageLabelsRepository.saveAll(newUsageLabels);  // Salvar as novas associações
+        usageRepository.save(usage);  // Salvar a entidade Usage atualizada
+    }
+    
     private void validateUserMedicationUsages(List<UserMedicationStock> userMedicationStocks, UsageRequest usageRequest) {
         for (UsageRequest.MedicationStockRequest medicationRequest : usageRequest.getMedications()) {
             UUID medicationStockId = medicationRequest.getMedicationStockId();

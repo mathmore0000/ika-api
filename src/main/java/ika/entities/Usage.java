@@ -29,7 +29,7 @@ public class Usage {
     @JoinColumn(name = "id_file")
     private FileEntity video;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "usage_labels",
             joinColumns = @JoinColumn(name = "id_usage"),

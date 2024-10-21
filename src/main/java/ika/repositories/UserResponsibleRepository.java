@@ -15,6 +15,9 @@ import java.util.UUID;
 public interface UserResponsibleRepository extends JpaRepository<UserResponsible, UUID> {
     boolean existsByUserIdAndResponsibleId(UUID userId, UUID responsibleId);
 
+    @Query("SELECT COUNT(ur) > 0 FROM UserResponsible ur WHERE ur.userId = :userId AND ur.responsibleId = :responsibleId AND ur.accepted = true")
+    boolean existsByResponsibleIdAndUserIdAndAccepted(@Param("userId") UUID userId, @Param("responsibleId") UUID responsibleId);
+
     @Query("SELECT ur FROM UserResponsible ur WHERE ur.userId = :userId AND ur.responsibleId = :responsibleId AND ur.accepted = false")
     Optional<UserResponsible> findByUserIdAndResponsibleIdAndAcceptedFalse(UUID userId, UUID responsibleId);
 
