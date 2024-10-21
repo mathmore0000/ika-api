@@ -123,7 +123,7 @@ public class UsageService {
         usageLabelsRepository.saveAll(newUsageLabels);  // Salvar as novas associações
         usageRepository.save(usage);  // Salvar a entidade Usage atualizada
     }
-    
+
     private void validateUserMedicationUsages(List<UserMedicationStock> userMedicationStocks, UsageRequest usageRequest) {
         for (UsageRequest.MedicationStockRequest medicationRequest : usageRequest.getMedications()) {
             UUID medicationStockId = medicationRequest.getMedicationStockId();
@@ -205,6 +205,7 @@ public class UsageService {
         return usageRepository.findAllWithFilters(isApproved, fromDate, toDate, pageable);
     }
 
+    @Transactional
     public void deleteUsage(UUID userId, UUID usageId) {
         // Buscar o usage pelo id e validar o userId
         Usage usage = usageRepository.findByIdAndUserId(usageId, userId)
@@ -217,6 +218,8 @@ public class UsageService {
 
         // Deletar os logs de uso da medicação associados
         userMedicationStockLogUsageService.deleteLogsByUsageId(usageId);
+
+        usageLabelsRepository.deleteByUsageId(usageId);
 
         // Deletar o usage
         usageRepository.delete(usage);

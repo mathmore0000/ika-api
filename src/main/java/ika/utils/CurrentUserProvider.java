@@ -52,6 +52,10 @@ public class CurrentUserProvider {
         throw new RuntimeException("No authentication token found");
     }
 
+    public boolean isUserLoggedIn() {
+        return !(getTokenFromRequest() == null);
+    }
+
     private String getTokenFromRequest() {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null) {

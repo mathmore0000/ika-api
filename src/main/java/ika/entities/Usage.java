@@ -29,12 +29,15 @@ public class Usage {
     @JoinColumn(name = "id_file")
     private FileEntity video;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(
             name = "usage_labels",
             joinColumns = @JoinColumn(name = "id_usage"),
             inverseJoinColumns = @JoinColumn(name = "id_label")
     )
     private Set<Label> labels = new HashSet<>();
+
+    @OneToMany(mappedBy = "usage", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserMedicationStockUsage> stockUsages;  // Assuming you have a mappedBy in UserMedicationStockUsage
 }
 

@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface UsageLabelsRepository extends JpaRepository<UsageLabels, UUID> {
     List<UsageLabels> findByUsage_Id(UUID idUsage);
+    void deleteByUsageId(UUID idUsage);
 }

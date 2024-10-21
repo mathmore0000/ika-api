@@ -47,8 +47,13 @@ public class CustomTransactionManagerConfig {
             super.doBegin(transaction, definition);
             try {
                 Connection connection = DataSourceUtils.getConnection(dataSource);
-                UUID userId = currentUserProvider.getCurrentUserId();
-                String setUserQuery = "SET myapp.user_id = '" + userId + "'";
+                String setUserQuery;
+                if (currentUserProvider.isUserLoggedIn()) {
+                    UUID userId = currentUserProvider.getCurrentUserId();
+                    setUserQuery = "SET myapp.user_id = '" + userId + "'";
+                } else {
+                    setUserQuery = "SET myapp.user_id = 'unlogged user'";
+                }
                 String setAppNameQuery = "SET application_name = 'ika-api'";
                 System.out.println("Setting user_id and application_name for the session.");
                 connection.createStatement().execute(setUserQuery);
