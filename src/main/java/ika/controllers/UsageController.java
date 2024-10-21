@@ -2,6 +2,7 @@ package ika.controllers;
 
 import ika.entities.Usage;
 import ika.entities.aux_classes.CustomPageResponse;
+import ika.entities.aux_classes.usage.ApproveRejectUsageRequest;
 import ika.entities.aux_classes.usage.UsageRequest;
 import ika.services.UsageService;
 import ika.utils.CurrentUserProvider;
@@ -58,8 +59,41 @@ public class UsageController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping()
-    public ResponseEntity<CustomPageResponse<Usage>> getFilteredUsages(
+    @GetMapping("/user")
+    public ResponseEntity<CustomPageResponse<Usage>> getFilteredUsagesByResponsible(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "isApproved", required = false) Boolean isApproved,
+            @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+            @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate,
+            @RequestParam(defaultValue = "actionTmstamp") String sortBy,  // Campo de ordenação, por padrão "actionTmstamp"
+            @RequestParam(defaultValue = "asc") String sortDirection // Direção de ordenação, por padrão "asc"
+    ) {
+        // Valida e ajusta os parâmetros de paginação, se necessário
+        page = CustomPageResponse.getValidPage(page);
+        size = CustomPageResponse.getValidSize(size);
+
+        // Cria o Pageable com base nos parâmetros de paginação e ordenação
+        Pageable pageable = CustomPageResponse.createPageableWithSort(page, size, sortBy, sortDirection);
+
+        // Chama o serviço passando os filtros e a paginação
+        Page<Usage> usagePage = usageService.getFilteredUsages(isApproved, fromDate, toDate, pageable);
+
+        // Cria a resposta customizada para retornar
+        CustomPageResponse<Usage> customPageResponse = new CustomPageResponse<>(
+                usagePage.getContent(),
+                usagePage.getNumber(),
+                usagePage.getSize(),
+                usagePage.getSort(),
+                usagePage.getPageable().getOffset(),
+                usagePage.getTotalPages()
+        );
+
+        return ResponseEntity.ok(customPageResponse);
+    }
+
+    @GetMapping("/responsible")
+    public ResponseEntity<CustomPageResponse<Usage>> getFilteredUsagesByUser(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(value = "isApproved", required = false) Boolean isApproved,
@@ -97,5 +131,25 @@ public class UsageController {
         UUID userId = currentUserProvider.getCurrentUserId();
         usageService.deleteUsage(userId, usageId);
         return ResponseEntity.ok("Usage deleted successfully");
+    }
+
+    @PostMapping("/{id}/approve")
+    public ResponseEntity<?> approveUsage(@PathVariable UUID id, @Valid @RequestBody ApproveRejectUsageRequest request) {
+        try {
+            usageService.updateUsage(id, request, true);
+            return ResponseEntity.ok("Usage approved successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<?> rejectUsage(@PathVariable UUID id, @Valid @RequestBody ApproveRejectUsageRequest request) {
+        try {
+            usageService.updateUsage(id, request, false);
+            return ResponseEntity.ok("Usage rejected successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

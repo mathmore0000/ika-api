@@ -105,6 +105,7 @@ CREATE TABLE public.usage
     id_user UUID NOT NULL,
     id_file UUID NOT NULL,
     is_approved BOOLEAN DEFAULT NULL,
+    obs VARCHAR(100) DEFAULT NULL,
     action_tmstamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ); 
 
@@ -118,7 +119,7 @@ CREATE TABLE public.labels
 CREATE TABLE public.usage_labels
 ( 
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),  
-    id_video_info UUID,  
+    id_usage UUID,
     id_label UUID
 ); 
 
@@ -200,9 +201,14 @@ FOREIGN KEY (id_file)
 REFERENCES storage.files (id);
 
 ALTER TABLE public.usage_labels
-ADD CONSTRAINT fk_label_video_info_labels 
+ADD CONSTRAINT fk_label_usage_labels
 FOREIGN KEY (id_label) 
 REFERENCES public.labels (id);
+
+ALTER TABLE public.usage_labels
+ADD CONSTRAINT fk_usage_usage_labels
+FOREIGN KEY (id_usage)
+REFERENCES public.usage (id);
 
 -- Add foreign key constraint to storage.files
 ALTER TABLE storage.files 

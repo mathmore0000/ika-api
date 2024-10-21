@@ -1,12 +1,13 @@
 package ika.services;
 
-import ika.entities.FileEntity;
-import ika.entities.Usage;
-import ika.entities.UserMedication;
-import ika.entities.UserMedicationStock;
+import ika.entities.*;
+import ika.entities.aux_classes.usage.ApproveRejectUsageRequest;
 import ika.entities.aux_classes.usage.UsageRequest;
+import ika.repositories.LabelRepository;
+import ika.repositories.UsageLabelsRepository;
 import ika.repositories.UsageRepository;
 import ika.utils.exceptions.ResourceNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,15 +16,20 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UsageService {
 
     @Autowired
     private UsageRepository usageRepository;
+
+    @Autowired
+    private UsageLabelsRepository usageLabelsRepository;
+
+    @Autowired
+    private LabelRepository labelRepository;
 
     @Autowired
     private FileService fileService;
@@ -72,6 +78,32 @@ public class UsageService {
                 "usageId", usage.getId().toString(),
                 "videoId", video.getId().toString()
         );
+    }
+
+    @Transactional
+    public void updateUsage(UUID usageId, ApproveRejectUsageRequest request, boolean isApproved) throws Exception {
+        Optional<Usage> usageOptional = usageRepository.findById(usageId);
+        if (usageOptional.isEmpty()) {
+            throw new ResourceNotFoundException("Usage not found.");
+        }
+        Usage usage = usageOptional.get();
+        usage.setIsApproved(isApproved);
+        usage.setObs(request.getObs());
+
+        // Add labels if they do not exist
+        Set<Label> newLabels = new HashSet<>(Set.of());
+        for (UUID labelId : request.getLabels()) {
+            Label label = labelRepository.findById(labelId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Some labels could not be found."));
+            newLabels.add(label);
+        }
+        usage.setLabels(newLabels);
+        List<UUID> usageLabelIds = usageLabelsRepository.findByUsage_Id(usageId).stream()
+                .map(UsageLabels::getId)
+                .collect(Collectors.toList());
+        System.out.println(usageLabelIds);
+        usageLabelsRepository.deleteAllById(usageLabelIds);
+        usageRepository.save(usage);
     }
 
     private void validateUserMedicationUsages(List<UserMedicationStock> userMedicationStocks, UsageRequest usageRequest) {

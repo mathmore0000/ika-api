@@ -1,9 +1,14 @@
 package ika.entities;
 
 import jakarta.persistence.*;
+import lombok.Data;
+
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
+@Data
 @Table(name = "labels")
 public class Label {
 
@@ -14,27 +19,13 @@ public class Label {
     @Column(nullable = false)
     private String description;
 
+    @ManyToMany(mappedBy = "labels")
+    private Set<Usage> usages = new HashSet<>();
+
     // Constructors
     public Label() {}
 
     public Label(UUID id, String description) {
         this.id = id; this.description = description;
-    }
-
-    // Getters and Setters
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }
