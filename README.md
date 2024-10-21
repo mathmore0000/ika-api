@@ -7,7 +7,7 @@ Desenhos da documentação até agora (!!!WIP!!!, vou adicionar mais informaçõ
 
 <h3>Modelagem banco de dados:</h3>
 
-![DB](https://github.com/user-attachments/assets/5e33966b-e23d-469b-bcb4-9b89eb292cd8)
+![DB](https://github.com/user-attachments/assets/fc89739f-f8bd-4289-8017-a2504038b470)
 <br><h3>Desenho arquitetura v1 (mvp):</h3>
 ![arq v1](https://github.com/user-attachments/assets/32673196-a5fe-44de-85f3-20b45a49afca)
 <br><h3>Desenho arquitetura v2 (prep):</h3>
