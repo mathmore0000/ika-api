@@ -1,31 +1,17 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres
-    container_name: postgres-ika
-    environment:
-      POSTGRES_DB: ika
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    networks:
-      - ika-network
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-
   setup-postgres:
     image: postgres:alpine
     container_name: setup-postgres-container
     depends_on:
       - postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: ika
+      POSTGRES_DB: ${SPRING_DATASOURCE_DB}
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     entrypoint: /bin/sh -c "sleep 10 && \
-      PGPASSWORD=password psql -h postgres -U postgres -d ika -c \"INSERT INTO storage.buckets (id, description) VALUES ('80177d00-de14-4fe3-99d3-b11c0a64298f', 'videos');\""
+      PGPASSWORD=${SPRING_DATASOURCE_PASSWORD} psql -h postgres -U ${SPRING_DATASOURCE_USERNAME} -d ${SPRING_DATASOURCE_DB} -c \"INSERT INTO storage.buckets (id, description) VALUES ('80177d00-de14-4fe3-99d3-b11c0a64298f', 'videos');\""
     networks:
       - ika-network
 
@@ -43,22 +29,41 @@ services:
     networks:
       - ika-network
 
+  postgres:
+    image: postgres
+    container_name: postgres-ika
+    environment:
+      POSTGRES_DB: ${SPRING_DATASOURCE_DB}
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SPRING_DATASOURCE_USERNAME} -d ${SPRING_DATASOURCE_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ika-network
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
   ika-api:
     image: ika-api
     container_name: ika-api
     environment:
-      SPRING_DATASOURCE_DB: ika
-      SPRING_DATASOURCE_HOST: postgres-ika
-      SPRING_DATASOURCE_PORT: 5432
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_FLYWAY_PROFILE: local
-      JWT_SECRET_KEY: super-duper-mega-real-secret-key
+      SPRING_DATASOURCE_DB: ${SPRING_DATASOURCE_DB}
+      SPRING_DATASOURCE_HOST: ${SPRING_DATASOURCE_HOST}
+      SPRING_DATASOURCE_PORT: ${SPRING_DATASOURCE_PORT}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_FLYWAY_PROFILE: ${SPRING_FLYWAY_PROFILE}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
-      - localstack
+      postgres:
+        condition: service_healthy
     networks:
       - ika-network
 
