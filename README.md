@@ -44,7 +44,7 @@ cp .env.example .env
 nano .env
 ```
 
-### 3. Contruir a imagem da aplicação
+### 3. Construir a imagem da aplicação
 ```
 docker build -t ika-api .
 ```
