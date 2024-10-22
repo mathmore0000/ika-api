@@ -17,7 +17,7 @@ public class S3ConfigLocal {
     public AmazonS3 s3Client() {
         return AmazonS3ClientBuilder.standard()
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(
-                        "http://localhost:4566", "sa-east-1"))
+                        "http://localstack:4566", "sa-east-1"))
                 .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials("local", "local")))
                 .enablePathStyleAccess()  // Isso evita problemas de incompatibilidade com LocalStack
                 .build();
