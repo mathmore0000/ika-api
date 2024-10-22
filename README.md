@@ -7,7 +7,7 @@
 ![Localstack](https://img.shields.io/badge/Localstack-1.20.0-blue)
 ![AWS S3](https://img.shields.io/badge/AWS%20S3-mock%20via%20Localstack-yellowgreen)
 
-A **IKA API** é uma aplicação Java desenvolvida com **Spring Boot** e PostgreSQL que gerencia o uso de medicamentos. A API permite registrar e acompanhar o consumo de medicamentos dos usuários por meio de vídeos, além de permitir a aprovação ou rejeição de registros por responsáveis.
+O **IKA API** é uma aplicação Java desenvolvida com **Spring Boot** e PostgreSQL que gerencia o uso de medicamentos. A API permite registrar e acompanhar o consumo de medicamentos dos usuários por meio de vídeos, além de permitir a aprovação ou rejeição de registros por responsáveis.
 
 ## Funcionalidades
 
@@ -38,12 +38,18 @@ git clone https://github.com/mathmore0000/ika-api.git
 cd ika-api
 ```
 
+### 2. Criar arquivo `.env`
+```
+cp .env.example .env
+nano .env
+```
+
 ### 3. Contruir a imagem da aplicação
 ```
 docker build -t ika-api .
 ```
 
-### 3. Rodar os contêineres
+### 4. Rodar os contêineres
 ```
 docker-compose up --build
 ```
