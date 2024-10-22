@@ -7,7 +7,7 @@
 ![Localstack](https://img.shields.io/badge/Localstack-1.20.0-blue)
 ![AWS S3](https://img.shields.io/badge/AWS%20S3-mock%20via%20Localstack-yellowgreen)
 
-A **IKA API** é uma aplicação Java desenvolvida com **Spring Boot** e PostgreSQL que gerencia o uso de medicamentos. A API permite registrar e acompanhar o consumo de medicamentos dos usuários por meio de vídeos, além de permitir a aprovação ou rejeição de registros por responsáveis.
+O **IKA API** é uma aplicação Java desenvolvida com **Spring Boot** e PostgreSQL que gerencia o uso de medicamentos. A API permite registrar e acompanhar o consumo de medicamentos dos usuários por meio de vídeos, além de permitir a aprovação ou rejeição de registros por responsáveis.
 
 ## Funcionalidades
 
