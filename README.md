@@ -21,7 +21,7 @@ O **IKA API** é a API do app IKA em Java desenvolvida com **Spring Boot** e Pos
 - **Java 17**: Linguagem principal do projeto
 - **Spring Boot**: Framework para criação de aplicações Java robustas e escaláveis
 - **PostgreSQL 16.3**: Banco de dados relacional utilizado para armazenar informações dos medicamentos e usuários
-- **AWS S3 (via Localstack)**: Armazenamento de vídeos simulando a integração com a AWS S3
+- **AWS S3**: Armazenamento de vídeos simulando a integração com a AWS S3
 - **Docker e Docker Compose**: Ferramentas para facilitar o desenvolvimento e deploy da aplicação
 - **Maven**: Ferramenta de build e gerenciamento de dependências
 
