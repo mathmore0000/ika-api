@@ -11,12 +11,16 @@ import ika.entities.aux_classes.user_medication_stock.UserMedicationStockRequest
 import ika.repositories.*;
 import ika.services.UserService;
 import ika.utils.JwtUtil;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,6 +46,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UsageControllerTest {
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Autowired
     UserResponsibleRepository userResponsibleRepository;
@@ -748,12 +755,18 @@ class UsageControllerTest {
         return existingLabel.get().getId();
     }
 
-    private void createResponsibleForUser(UUID userId) {
-        UserResponsible responsible = new UserResponsible();
-        responsible.setUserId(userId);
-        responsible.setResponsibleId(userId);  // O usuário logado será o responsável
-        responsible.setAccepted(true);
-        userResponsibleRepository.save(responsible);
+    private void createResponsibleForUser(UUID userId) throws Exception {
+        String responsibleEmail = userRepository.findById(userId).get().getEmail();
+        mockMvc.perform(post("/v1/responsibles")
+                        .param("emailResponsible", responsibleEmail)
+                        .header("Authorization", "Bearer " + jwt)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        Pageable pageable = null;
+        Page<UserResponsible> userResponsibles = userResponsibleRepository.findByUserIdAndAccepted(userId, false, pageable);
+        UserResponsible userResponsible = userResponsibles.toList().get(0);
+        userResponsible.setAccepted(true);
+        userResponsibleRepository.save(userResponsible);
     }
 
     private UUID createUsage() throws Exception {
