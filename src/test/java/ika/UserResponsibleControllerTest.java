@@ -109,11 +109,11 @@ class UserResponsibleControllerTest {
     @Test
     void testCreateRequestSuccess() throws Exception {
         // Create a new responsible user to be associated with the request
-        UUID responsibleId = createResponsibleUser("Responsible User", "responsible_user@ika.com");
+        String responsibleEmail = createResponsibleUser("Responsible User", "responsible_user@ika.com");
 
         // Perform the POST request to create a responsible request
         mockMvc.perform(post("/v1/responsibles")
-                        .param("idResponsible", responsibleId.toString())
+                        .param("emailResponsible", responsibleEmail)
                         .header("Authorization", "Bearer " + jwt_default_user)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -121,18 +121,18 @@ class UserResponsibleControllerTest {
 
     @Test
     void testCreateRequestDuplicate() throws Exception {
-        UUID responsibleId = createResponsibleUser("Responsible User", "responsible_user@ika.com");
+        String responsibleEmail = createResponsibleUser("Responsible User", "responsible_user@ika.com");
 
         // Create an initial request
         mockMvc.perform(post("/v1/responsibles")
-                        .param("idResponsible", responsibleId.toString())
+                        .param("emailResponsible", responsibleEmail)
                         .header("Authorization", "Bearer " + jwt_default_user)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
         // Try to create the same request again to verify conflict
         mockMvc.perform(post("/v1/responsibles")
-                        .param("idResponsible", responsibleId.toString())
+                        .param("emailResponsible", responsibleEmail)
                         .header("Authorization", "Bearer " + jwt_default_user)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
@@ -140,11 +140,11 @@ class UserResponsibleControllerTest {
 
     @Test
     void testAcceptRequestSuccess() throws Exception {
-        UUID responsibleId = createResponsibleUser("Responsible User", email_responsible);
+        String responsibleEmail = createResponsibleUser("Responsible User", email_responsible);
         String jwt_responsible_user = getJwtFromUser(email_responsible);
         // Create a new request
         mockMvc.perform(post("/v1/responsibles")
-                        .param("idResponsible", responsibleId.toString())
+                        .param("emailResponsible", responsibleEmail)
                         .header("Authorization", "Bearer " + jwt_default_user)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -160,19 +160,20 @@ class UserResponsibleControllerTest {
 
     @Test
     void testDeleteRequestByResponsibleSuccess() throws Exception {
-        UUID responsibleId = createResponsibleUser("Responsible User", email_responsible);
+        String responsibleEmail = createResponsibleUser("Responsible User", email_responsible);
+        UUID idResponsible = userService.loadUserByEmail(responsibleEmail).get().getId();
         String jwt_responsible_user = getJwtFromUser(email_responsible);
 
         // Create a new request
         mockMvc.perform(post("/v1/responsibles")
-                        .param("idResponsible", responsibleId.toString())
+                        .param("emailResponsible", responsibleEmail)
                         .header("Authorization", "Bearer " + jwt_default_user)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
         // Delete the request by the responsible user
         mockMvc.perform(delete("/v1/responsibles/by-responsible")
-                        .param("idResponsible", responsibleId.toString())
+                        .param("idResponsible", idResponsible.toString())
                         .header("Authorization", "Bearer " + jwt_default_user)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -180,11 +181,11 @@ class UserResponsibleControllerTest {
 
     @Test
     void testDeleteRequestByUserSuccess() throws Exception {
-        UUID responsibleId = createResponsibleUser("Responsible User", email_responsible);
+        createResponsibleUser("Responsible User", email_responsible);
         String jwt_responsible_user = getJwtFromUser(email_responsible);
 
         // Create a new request
-        createResponsibleRequest(responsibleId);
+        createResponsibleRequest(email_responsible);
 
         // Delete the request by the user
         mockMvc.perform(delete("/v1/responsibles/by-user")
@@ -196,13 +197,13 @@ class UserResponsibleControllerTest {
 
     @Test
     void testGetAllResponsibleWithFilterAndPagination() throws Exception {
-        UUID responsibleId = createResponsibleUser("Responsible User", email_responsible);
-        UUID responsible2Id = createResponsibleUser("Responsible User 2", "responsible_user2@ika.com");
+        String responsibleEmail = createResponsibleUser("Responsible User", email_responsible);
+        String responsible2Email = createResponsibleUser("Responsible User 2", "responsible_user2@ika.com");
         String jwt_responsible_user = getJwtFromUser(email_responsible);
 
         // Create multiple responsible requests
-        createResponsibleRequest(responsibleId);
-        createResponsibleRequest(responsible2Id);
+        createResponsibleRequest(email_responsible);
+        createResponsibleRequest(responsible2Email);
 
         // Perform the GET request with filter and pagination
         mockMvc.perform(get("/v1/responsibles/responsible")
@@ -212,15 +213,15 @@ class UserResponsibleControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].responsibleId").value(responsibleId.toString()));
+                .andExpect(jsonPath("$.content[0].responsible.email").value(responsibleEmail));
     }
 
     @Test
     void testGetAllUserWithFilterAndPagination() throws Exception {
-        UUID responsibleId = createResponsibleUser("Responsible User", email_responsible);
+        String responsibleEmail = createResponsibleUser("Responsible User", email_responsible);
 
         // Create multiple requests by user
-        createResponsibleRequest(responsibleId);
+        createResponsibleRequest(responsibleEmail);
 
         // Perform the GET request with filter and pagination
         mockMvc.perform(get("/v1/responsibles/user")
@@ -235,11 +236,9 @@ class UserResponsibleControllerTest {
 
     @Test
     void testCreateRequestWhenResponsibleDoesNotExist() throws Exception {
-        UUID nonExistentResponsibleId = UUID.randomUUID();
-
         // Attempt to create a request with a non-existent responsible ID
         mockMvc.perform(post("/v1/responsibles")
-                        .param("idResponsible", nonExistentResponsibleId.toString())
+                        .param("emailResponsible", email_responsible)
                         .header("Authorization", "Bearer " + jwt_default_user)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -281,15 +280,15 @@ class UserResponsibleControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    private UUID createResponsibleUser(String displayName, String email) throws Exception {
+    private String createResponsibleUser(String displayName, String email) throws Exception {
         createUser(displayName, email, "password", "pt");
         User user = userRepository.findByEmail(email).orElseThrow();
-        return user.getId();
+        return user.getEmail();
     }
 
-    private void createResponsibleRequest(UUID responsibleId) throws Exception {
+    private void createResponsibleRequest(String responsibleEmail) throws Exception {
         mockMvc.perform(post("/v1/responsibles")
-                        .param("idResponsible", responsibleId.toString())
+                        .param("emailResponsible", responsibleEmail)
                         .header("Authorization", "Bearer " + jwt_default_user)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
