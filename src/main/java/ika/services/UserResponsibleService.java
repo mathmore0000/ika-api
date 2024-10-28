@@ -1,9 +1,12 @@
 package ika.services;
 
+import ika.entities.User;
 import ika.entities.UserResponsible;
 import ika.repositories.UserRepository;
 import ika.repositories.UserResponsibleRepository;
 import ika.utils.exceptions.ResourceNotFoundException;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,18 +24,20 @@ public class UserResponsibleService {
     @Autowired
     private UserRepository userRepository;
 
-    public Optional<UserResponsible> createResponsibleRequest(UUID idUser, UUID idResponsible) {
-        // Check for existing relationship to prevent duplicates
-        if (!userRepository.existsById(idResponsible)) {
-            throw new ResourceNotFoundException("Responsible not found");
-        }
-        if (userResponsibleRepository.existsByUserIdAndResponsibleId(idUser, idResponsible)) {
+    @Autowired
+    private EntityManager entityManager;
+
+    @Transactional
+    public Optional<UserResponsible> createResponsibleRequest(UUID userId, UUID responsibleId) {
+        if (userResponsibleRepository.existsByUserIdAndResponsibleId(userId, responsibleId)) {
             return Optional.empty();
         }
+        User user = entityManager.find(User.class, userId);
+        User responsible = entityManager.find(User.class, responsibleId);
 
         UserResponsible userResponsible = new UserResponsible();
-        userResponsible.setUserId(idUser);
-        userResponsible.setResponsibleId(idResponsible);
+        userResponsible.setResponsible(responsible);
+        userResponsible.setUser(user);
         return Optional.of(userResponsibleRepository.save(userResponsible));
     }
 

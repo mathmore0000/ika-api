@@ -1,9 +1,12 @@
 package ika.controllers;
 
+import ika.entities.User;
 import ika.entities.aux_classes.CustomPageResponse;
 import ika.entities.UserResponsible;
 import ika.services.UserResponsibleService;
+import ika.services.UserService;
 import ika.utils.CurrentUserProvider;  // Assuming you have this utility
+import ika.utils.exceptions.ResourceNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,15 +28,17 @@ public class UserResponsibleController {
     @Autowired
     private CurrentUserProvider currentUserProvider;
 
-    @PostMapping()
-    public ResponseEntity<UserResponsible> createRequest(@RequestParam UUID idResponsible) {
-        System.out.println(idResponsible);
-        UUID idUser = currentUserProvider.getCurrentUserId();
-        Optional<UserResponsible> createdRequest = userResponsibleService.createResponsibleRequest(idUser, idResponsible);
+    @Autowired
+    private UserService userService;
 
-        return createdRequest
-                .map(request -> ResponseEntity.status(HttpStatus.CREATED).body(request))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.CONFLICT).build());  // Conflict if duplicate
+    @PostMapping()
+    public ResponseEntity<UserResponsible> createRequest(@RequestParam String emailResponsible) {
+        System.out.println(emailResponsible);
+        User responsible = userService.loadUserByEmail(emailResponsible).orElseThrow(() -> new ResourceNotFoundException("Responsible not found"));
+        UUID userId = currentUserProvider.getCurrentUserId();
+        Optional<UserResponsible> createdRequest = userResponsibleService.createResponsibleRequest(userId, responsible.getId());
+
+        return createdRequest.map(request -> ResponseEntity.status(HttpStatus.CREATED).body(request)).orElseGet(() -> ResponseEntity.status(HttpStatus.CONFLICT).build());  // Conflict if duplicate
     }
 
     @PutMapping("/accept")
@@ -41,9 +46,7 @@ public class UserResponsibleController {
         UUID idResponsible = currentUserProvider.getCurrentUserId();
         Optional<UserResponsible> acceptedRequest = userResponsibleService.acceptResponsibleRequest(idResponsible, idUser);
 
-        return acceptedRequest
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        return acceptedRequest.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @DeleteMapping("/by-responsible")
@@ -63,36 +66,22 @@ public class UserResponsibleController {
     }
 
     @GetMapping("/responsible")
-    public ResponseEntity<CustomPageResponse<UserResponsible>> getAllResponsible(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "200") int size,
-            @RequestParam(value = "accepted", required = false) Boolean accepted,  // Use Boolean to allow null values
-            @RequestParam(defaultValue = "createdAt") String sortBy,  // Sorting field
-            @RequestParam(defaultValue = "asc") String sortDirection) { // Sorting direction
-            UUID idResponsible = currentUserProvider.getCurrentUserId();
+    public ResponseEntity<CustomPageResponse<UserResponsible>> getAllResponsible(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "200") int size, @RequestParam(value = "accepted", required = false) Boolean accepted,  // Use Boolean to allow null values
+                                                                                 @RequestParam(defaultValue = "createdAt") String sortBy,  // Sorting field
+                                                                                 @RequestParam(defaultValue = "asc") String sortDirection) { // Sorting direction
+        UUID idResponsible = currentUserProvider.getCurrentUserId();
         Pageable pageable = CustomPageResponse.createPageableWithSort(page, size, sortBy, sortDirection);
         Page<UserResponsible> responsiblesPage = userResponsibleService.getAllResponsibles(idResponsible, accepted, pageable);
 
-        CustomPageResponse<UserResponsible> customPageResponse = new CustomPageResponse<>(
-                responsiblesPage.getContent(),
-                responsiblesPage.getNumber(),
-                responsiblesPage.getSize(),
-                responsiblesPage.getSort(),
-                responsiblesPage.getPageable().getOffset(),
-                responsiblesPage.getTotalPages()
-        );
+        CustomPageResponse<UserResponsible> customPageResponse = new CustomPageResponse<>(responsiblesPage.getContent(), responsiblesPage.getNumber(), responsiblesPage.getSize(), responsiblesPage.getSort(), responsiblesPage.getPageable().getOffset(), responsiblesPage.getTotalPages());
 
         return ResponseEntity.ok(customPageResponse);
     }
 
 
     @GetMapping("/user")
-    public ResponseEntity<CustomPageResponse<UserResponsible>> getAllUser(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "200") int size,
-            @RequestParam(value = "accepted", required = false) Boolean accepted,
-            @RequestParam(defaultValue = "createdAt") String sortBy,  // Campo de ordenação
-            @RequestParam(defaultValue = "asc") String sortDirection) { // Direção de ordenação)
+    public ResponseEntity<CustomPageResponse<UserResponsible>> getAllUser(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "200") int size, @RequestParam(value = "accepted", required = false) Boolean accepted, @RequestParam(defaultValue = "createdAt") String sortBy,  // Campo de ordenação
+                                                                          @RequestParam(defaultValue = "asc") String sortDirection) { // Direção de ordenação)
         UUID idUser = currentUserProvider.getCurrentUserId();
 
         page = CustomPageResponse.getValidPage(page);
@@ -102,14 +91,7 @@ public class UserResponsibleController {
         Pageable pageable = CustomPageResponse.createPageableWithSort(page, size, sortBy, sortDirection);
         Page<UserResponsible> usersPage = userResponsibleService.getAllUsers(idUser, accepted, pageable);
 
-        CustomPageResponse<UserResponsible> customPageResponse = new CustomPageResponse<>(
-                usersPage.getContent(),
-                usersPage.getNumber(),
-                usersPage.getSize(),
-                usersPage.getSort(),
-                usersPage.getPageable().getOffset(),
-                usersPage.getTotalPages()
-        );
+        CustomPageResponse<UserResponsible> customPageResponse = new CustomPageResponse<>(usersPage.getContent(), usersPage.getNumber(), usersPage.getSize(), usersPage.getSort(), usersPage.getPageable().getOffset(), usersPage.getTotalPages());
         return ResponseEntity.ok(customPageResponse);
     }
 }
