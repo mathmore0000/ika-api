@@ -20,7 +20,7 @@ public class MedicationResponse {
         this.category = medication.getCategory();
         this.dosage = medication.getDosage();
         this.isValid = medication.isValid();
-        this.maxValidationTime = medication.getMaxValidationTime();
+        this.maxTakingTime = medication.getMaxTakingTime();
         this.timeBetween = medication.getTimeBetween();
         this.quantityInt = medication.getQuantityInt();
         this.quantityMl = medication.getQuantityMl();
@@ -43,7 +43,7 @@ public class MedicationResponse {
 
     private boolean isValid;
 
-    private float maxValidationTime;
+    private float maxTakingTime;
 
     private float timeBetween;
 

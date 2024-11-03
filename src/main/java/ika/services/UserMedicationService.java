@@ -42,8 +42,8 @@ public class UserMedicationService {
         userMedication.setUser(user);
         userMedication.setMedication(medication);
         // Set defaults if values are not provided by the user
-        if (userMedicationDetails.getMaxValidationTime() <= 0) {
-            userMedication.setMaxValidationTime(medication.getMaxValidationTime());
+        if (userMedicationDetails.getMaxTakingTime() <= 0) {
+            userMedication.setMaxTakingTime(medication.getMaxTakingTime());
         }
         if (userMedicationDetails.getTimeBetween() <= 0) {
             userMedication.setTimeBetween(medication.getTimeBetween());
@@ -82,7 +82,7 @@ public class UserMedicationService {
             userMedication.setQuantityMl(request.getQuantityMl());
             userMedication.setTimeBetween(request.getTimeBetween());
             userMedication.setFirstDosageTime(request.getFirstDosageTime());
-            userMedication.setMaxValidationTime(request.getMaxValidationTime());
+            userMedication.setMaxTakingTime(request.getMaxTakingTime());
 
             userMedicationRepository.save(userMedication);
             return userMedication;

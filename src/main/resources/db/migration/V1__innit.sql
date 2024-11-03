@@ -46,7 +46,7 @@ CREATE TABLE public.medication
     dosage FLOAT NOT NULL,  
     id_user UUID,
     is_valid BOOLEAN NOT NULL DEFAULT FALSE,  
-    max_validation_time FLOAT,
+    max_taking_time FLOAT,
     quantity_int INT,
     quantity_ml FLOAT,
     time_between FLOAT NOT NULL
@@ -63,7 +63,7 @@ CREATE TABLE public.user_medication
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     time_between FLOAT NOT NULL,  
     first_dosage_time TIMESTAMP NOT NULL,  
-    max_validation_time FLOAT
+    max_taking_time FLOAT
 ); 
 
 CREATE TABLE public.user_medication_stock 

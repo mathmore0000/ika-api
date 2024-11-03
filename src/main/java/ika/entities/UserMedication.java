@@ -40,8 +40,8 @@ public class UserMedication {
     @Column(name = "first_dosage_time", nullable = false)
     private LocalDateTime firstDosageTime;
 
-    @Column(name = "max_validation_time", nullable = false)
-    private float maxValidationTime;
+    @Column(name = "max_taking_time", nullable = false)
+    private float maxTakingTime;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -54,13 +54,13 @@ public class UserMedication {
         this.user = user;
         this.medication = medication;
         this.timeBetween = medication.getTimeBetween();
-        this.maxValidationTime = medication.getMaxValidationTime();
+        this.maxTakingTime = medication.getMaxTakingTime();
         this.quantityInt = quantityInt;
         this.quantityMl = quantityMl;
     }
 
     public UserMedication(UserMedicationRequest userMedicationDetails){
-        this.maxValidationTime = userMedicationDetails.getMaxValidationTime();
+        this.maxTakingTime = userMedicationDetails.getMaxTakingTime();
         this.disabled = false;
         this.quantityInt = userMedicationDetails.getQuantityInt();
         this.quantityMl = userMedicationDetails.getQuantityMl();

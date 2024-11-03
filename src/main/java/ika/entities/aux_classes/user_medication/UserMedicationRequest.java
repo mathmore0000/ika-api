@@ -23,5 +23,5 @@ public class UserMedicationRequest {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss") // Specify the format for parsing
     private LocalDateTime firstDosageTime;
 
-    private float maxValidationTime;
+    private float maxTakingTime;
 }

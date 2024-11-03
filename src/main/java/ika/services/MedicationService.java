@@ -49,7 +49,7 @@ public class MedicationService {
         medication.setDosage(medicationRequest.getDosage());
         medication.setDisabled(false);
         medication.setUser(user);
-        medication.setMaxValidationTime(medicationRequest.getMaxValidationTime());
+        medication.setMaxTakingTime(medicationRequest.getMaxTakingTime());
         medication.setTimeBetween(medicationRequest.getTimeBetween());
         medication.setBand(medicationRequest.getBand());
         medicationRepository.save(medication);
