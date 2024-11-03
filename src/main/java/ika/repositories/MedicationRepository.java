@@ -19,6 +19,7 @@ public interface MedicationRepository extends JpaRepository<Medication, Long> {
             "AND (:categoryId IS NULL OR m.category.id = :categoryId) " +
             "AND (:activeIngredientId IS NULL OR m.activeIngredient.id = :activeIngredientId)" +
             "AND (m.isValid = TRUE)" +
-            "AND (m.disabled = FALSE)")
-    Page<Medication> findAllWithFilters(String name, UUID categoryId, UUID activeIngredientId, Pageable pageable);
+            "AND (m.disabled = FALSE)" +
+            "OR (m.user.id = :userId)")
+    Page<Medication> findAllWithFilters(String name, UUID categoryId, UUID activeIngredientId, UUID userId, Pageable pageable);
 }

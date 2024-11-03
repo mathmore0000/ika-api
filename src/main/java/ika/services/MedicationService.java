@@ -66,7 +66,8 @@ public class MedicationService {
 
     public Page<MedicationResponse> getAllMedications(String name, UUID categoryId, UUID activeIngredientId, Pageable pageable) {
         System.out.println(name + categoryId + activeIngredientId + pageable.toString());
-        return medicationRepository.findAllWithFilters(name, categoryId, activeIngredientId, pageable)
+        UUID userId = currentUserProvider.getCurrentUserId();
+        return medicationRepository.findAllWithFilters(name, categoryId, activeIngredientId, userId, pageable)
                 .map(this::convertToMedicationResponse);
     }
     private MedicationResponse convertToMedicationResponse(Medication medication) {
