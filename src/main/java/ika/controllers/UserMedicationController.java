@@ -72,9 +72,9 @@ public class UserMedicationController {
     }
 
     // New endpoint to update a user medication
-    @PutMapping("/{userMedicationId}")
+    @PutMapping("/{medicationId}")
     public ResponseEntity<UserMedication> updateUserMedication(
-            @PathVariable UUID medicationId,
+            @Valid @NotNull(message="medicationId is required") @PathVariable UUID medicationId,
             @Valid @RequestBody UserMedicationRequest updatedRequest) {
         UUID userId = currentUserProvider.getCurrentUserId();
         UserMedication updatedMedication = userMedicationService.updateUserMedication(userId, medicationId, updatedRequest);
