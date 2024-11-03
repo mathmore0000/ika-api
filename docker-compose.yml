@@ -48,24 +48,24 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
-  ika-api:
-    image: ika-api
-    container_name: ika-api
-    environment:
-      SPRING_DATASOURCE_DB: ${SPRING_DATASOURCE_DB}
-      SPRING_DATASOURCE_HOST: ${SPRING_DATASOURCE_HOST}
-      SPRING_DATASOURCE_PORT: ${SPRING_DATASOURCE_PORT}
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-      SPRING_FLYWAY_PROFILE: ${SPRING_FLYWAY_PROFILE}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-      - localstack
-    networks:
-      - ika-network
+#  ika-api:
+#    image: ika-api
+#    container_name: ika-api
+#    environment:
+#      SPRING_DATASOURCE_DB: ${SPRING_DATASOURCE_DB}
+#      SPRING_DATASOURCE_HOST: ${SPRING_DATASOURCE_HOST}
+#      SPRING_DATASOURCE_PORT: ${SPRING_DATASOURCE_PORT}
+#      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+#      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+#      SPRING_FLYWAY_PROFILE: ${SPRING_FLYWAY_PROFILE}
+#      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - postgres
+#      - localstack
+#    networks:
+#      - ika-network
 
   localstack:
     image: localstack/localstack

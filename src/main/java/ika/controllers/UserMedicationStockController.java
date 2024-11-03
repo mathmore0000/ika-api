@@ -1,6 +1,7 @@
 package ika.controllers;
 
 import ika.entities.aux_classes.CustomPageResponse;
+import ika.entities.aux_classes.user_medication_stock.AvailableStockResponse;
 import ika.entities.aux_classes.user_medication_stock.UserMedicationStockRequest;
 import ika.entities.aux_classes.user_medication_stock.UserMedicationStockResponse;
 import ika.entities.UserMedicationStock;
@@ -49,6 +50,20 @@ public class UserMedicationStockController {
         stockService.deleteStock(stockId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/allStock/{medicationId}")
+    public ResponseEntity<AvailableStockResponse> getAllStockForUserMedication(
+            @PathVariable UUID medicationId) {
+
+        // Obtém o ID do usuário autenticado
+        UUID userId = currentUserProvider.getCurrentUserId();
+
+        // Chama o serviço para calcular o estoque disponível
+        AvailableStockResponse stock = stockService.getAvailableStock(userId, medicationId);
+
+        return ResponseEntity.ok(stock);
+    }
+
 
     @GetMapping("/{medicationId}")
     public ResponseEntity<CustomPageResponse<UserMedicationStockResponse>> getStockForUserMedication(

@@ -5,7 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,4 +17,8 @@ public interface UserMedicationStockRepository extends JpaRepository<UserMedicat
 
     @Query("SELECT ums FROM UserMedicationStock ums WHERE ums.userMedication.user.id = :userId AND ums.id IN :medicationIds")
     List<UserMedicationStock> findAllByUserIdAndMedicationIds(UUID userId, List<UUID> medicationIds);
+
+    @Query("SELECT ums FROM UserMedicationStock ums WHERE ums.userMedication.user.id = :userId AND ums.userMedication.medication.id = :medicationId AND ums.expirationDate >= :currentDate")
+    List<UserMedicationStock> findAllByUserIdAndMedicationIdAndNotExpired(@Param("userId") UUID userId, @Param("medicationId") UUID medicationId, @Param("currentDate") LocalDateTime currentDate);
+
 }

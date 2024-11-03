@@ -1,10 +1,13 @@
 package ika.services;
 
+import ika.entities.Medication;
+import ika.entities.aux_classes.user_medication_stock.AvailableStockResponse;
 import ika.entities.aux_classes.user_medication_stock.UserMedicationStockResponse;
 import ika.entities.UserMedication;
 import ika.entities.UserMedicationStock;
 import ika.repositories.UserMedicationRepository;
 import ika.repositories.UserMedicationStockRepository;
+import ika.repositories.UserMedicationStockUsageRepository;
 import ika.utils.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,6 +26,12 @@ public class UserMedicationStockService {
 
     @Autowired
     private UserMedicationRepository userMedicationRepository;
+
+    @Autowired
+    private UserMedicationStockUsageRepository usageRepository;
+
+    @Autowired
+    private UserMedicationStockUsageService userMedicationStockUsageService;
 
     public UserMedicationStock addStock(UUID userMedicationId, int quantityStocked, LocalDateTime expirationDate) {
         UserMedication userMedication = userMedicationRepository.findById(userMedicationId)
@@ -53,6 +62,90 @@ public class UserMedicationStockService {
 
         stockRepository.delete(stock);
     }
+
+    public AvailableStockResponse getAvailableStock(UUID userId, UUID medicationId) {
+        // Obter todos os estoques não vencidos para a medicação e usuário especificados
+        List<UserMedicationStock> validStocks = stockRepository.findAllByUserIdAndMedicationIdAndNotExpired(userId, medicationId, LocalDateTime.now());
+
+        if (validStocks.isEmpty()) {
+            return new AvailableStockResponse("unknown", 0);
+        }
+
+        // Determinar o tipo de medicação (sólido ou líquido)
+        UserMedication userMedication = validStocks.get(0).getUserMedication();
+
+        String medicationType;
+        Number totalAvailableQuantity;
+
+        if (userMedication.getQuantityMl() != null && userMedication.getQuantityMl() > 0) {
+            medicationType = "liquid";
+            totalAvailableQuantity = calculateAvailableQuantityMl(validStocks);
+        } else if (userMedication.getQuantityInt() != null && userMedication.getQuantityInt() > 0) {
+            medicationType = "solid";
+            totalAvailableQuantity = calculateAvailableQuantityInt(validStocks);
+        } else {
+            medicationType = "unknown";
+            totalAvailableQuantity = 0;
+        }
+
+        return new AvailableStockResponse(medicationType, totalAvailableQuantity);
+    }
+
+    private Float calculateAvailableQuantityMl(List<UserMedicationStock> validStocks) {
+        float totalAvailableMl = 0f;
+
+        for (UserMedicationStock stock : validStocks) {
+            int quantityStocked = stock.getQuantityStocked();
+            Float quantityPerUnit = stock.getUserMedication().getQuantityMl(); // Quantidade em ml por unidade de estoque
+
+            if (quantityPerUnit == null || quantityPerUnit <= 0) {
+                continue;
+            }
+
+            // Quantidade total deste estoque
+            float stockTotalMl = quantityStocked * quantityPerUnit;
+
+            // Obter a quantidade já utilizada deste estoque usando o método existente
+            Float usedMl = usageRepository.sumQuantityMlByMedicationStockId(stock.getId()).orElse(0f);
+
+            // Quantidade disponível neste estoque
+            float stockAvailableMl = stockTotalMl - usedMl;
+
+            totalAvailableMl += stockAvailableMl;
+        }
+
+        return totalAvailableMl;
+    }
+
+    private Integer calculateAvailableQuantityInt(List<UserMedicationStock> validStocks) {
+        int totalAvailableInt = 0;
+
+        for (UserMedicationStock stock : validStocks) {
+            int quantityStocked = stock.getQuantityStocked();
+            Integer quantityPerUnit = stock.getUserMedication().getQuantityInt(); // Quantidade em unidades por unidade de estoque
+
+            if (quantityPerUnit == null || quantityPerUnit <= 0) {
+                continue;
+            }
+
+            // Quantidade total deste estoque
+            int stockTotalInt = quantityStocked * quantityPerUnit;
+
+            // Obter a quantidade já utilizada deste estoque usando o método existente
+            Integer usedInt = usageRepository.sumQuantityIntByMedicationStockId(stock.getId()).orElse(0);
+            System.out.println("Achei usage! " + usedInt);
+            // Quantidade disponível neste estoque
+            int stockAvailableInt = stockTotalInt - usedInt;
+            System.out.println(totalAvailableInt + " + " + stockAvailableInt);
+
+            totalAvailableInt += stockAvailableInt;
+        }
+
+        return totalAvailableInt;
+    }
+
+
+
 
     public Page<UserMedicationStockResponse> getStockForUserMedicationByIdUserIdAndMedication(UUID userId, UUID medicationId, Pageable pageable) {
         Page<UserMedicationStock> stocks = stockRepository.findAllByUserIdAndMedicationId(userId, medicationId, pageable);
