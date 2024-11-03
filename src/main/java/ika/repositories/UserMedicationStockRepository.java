@@ -21,4 +21,6 @@ public interface UserMedicationStockRepository extends JpaRepository<UserMedicat
     @Query("SELECT ums FROM UserMedicationStock ums WHERE ums.userMedication.user.id = :userId AND ums.userMedication.medication.id = :medicationId AND ums.expirationDate >= :currentDate")
     List<UserMedicationStock> findAllByUserIdAndMedicationIdAndNotExpired(@Param("userId") UUID userId, @Param("medicationId") UUID medicationId, @Param("currentDate") LocalDateTime currentDate);
 
+    @Query("SELECT ums FROM UserMedicationStock ums WHERE ums.userMedication.user.id = :userId AND ums.userMedication.medication.id = :medicationId AND ums.expirationDate >= :currentDate order by ums.expirationDate")
+    List<UserMedicationStock> findAllByUserIdAndMedicationIdAndNotExpiredOrderedByExpirationDate(@Param("userId") UUID userId, @Param("medicationId") UUID medicationId, @Param("currentDate") LocalDateTime currentDate);
 }

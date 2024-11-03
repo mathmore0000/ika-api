@@ -10,6 +10,7 @@ import ika.repositories.UserMedicationStockRepository;
 import ika.repositories.UserMedicationStockUsageRepository;
 import ika.utils.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -144,8 +145,65 @@ public class UserMedicationStockService {
         return totalAvailableInt;
     }
 
+    public LocalDateTime getStockForUserMedicationByUserIdAndMedicationId(UUID userId, UUID medicationId) {
+        List<UserMedicationStock> validStocks = stockRepository.findAllByUserIdAndMedicationIdAndNotExpiredOrderedByExpirationDate(userId, medicationId, LocalDateTime.now());
 
+        if (validStocks.isEmpty()) {
+            return null;
+        }
+        UserMedication userMedication = validStocks.get(0).getUserMedication();
+        LocalDateTime nextExpirationDate = null;
+        if (userMedication.getQuantityMl() != null && userMedication.getQuantityMl() > 0) {
+            nextExpirationDate = findNextExpirationDateQuantityMl(validStocks);
+        } else if (userMedication.getQuantityInt() != null && userMedication.getQuantityInt() > 0) {
+            nextExpirationDate = findNextExpirationDateQuantityInt(validStocks);
+        }
 
+        return nextExpirationDate;
+
+    }
+
+    private LocalDateTime findNextExpirationDateQuantityMl(List<UserMedicationStock> validStocks) {
+        for (UserMedicationStock stock : validStocks) {
+            int quantityStocked = stock.getQuantityStocked();
+            Float quantityPerUnit = stock.getUserMedication().getQuantityMl();
+
+            if (quantityPerUnit == null || quantityPerUnit <= 0) {
+                continue;
+            }
+
+            float stockTotalMl = quantityStocked * quantityPerUnit;
+            Float usedMl = usageRepository.sumQuantityMlByMedicationStockId(stock.getId()).orElse(0f);
+            float stockAvailableMl = stockTotalMl - usedMl;
+
+            if (stockAvailableMl > 0) {
+                return stock.getExpirationDate();
+            }
+        }
+
+        return null;
+    }
+
+    private LocalDateTime findNextExpirationDateQuantityInt(List<UserMedicationStock> validStocks) {
+        for (UserMedicationStock stock : validStocks) {
+            int quantityStocked = stock.getQuantityStocked();
+            Integer quantityPerUnit = stock.getUserMedication().getQuantityInt();
+
+            if (quantityPerUnit == null || quantityPerUnit <= 0) {
+                continue;
+            }
+
+            int stockTotalInt = quantityStocked * quantityPerUnit;
+            Integer usedInt = usageRepository.sumQuantityIntByMedicationStockId(stock.getId()).orElse(0);
+            int stockAvailableInt = stockTotalInt - usedInt;
+
+            if (stockAvailableInt > 0) {
+                return stock.getExpirationDate();
+            }
+        }
+
+        return null;
+    }
 
     public Page<UserMedicationStockResponse> getStockForUserMedicationByIdUserIdAndMedication(UUID userId, UUID medicationId, Pageable pageable) {
         Page<UserMedicationStock> stocks = stockRepository.findAllByUserIdAndMedicationId(userId, medicationId, pageable);

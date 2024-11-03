@@ -9,12 +9,14 @@ import ika.services.UserMedicationStockService;
 import ika.utils.CurrentUserProvider;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -64,7 +66,6 @@ public class UserMedicationStockController {
         return ResponseEntity.ok(stock);
     }
 
-
     @GetMapping("/{medicationId}")
     public ResponseEntity<CustomPageResponse<UserMedicationStockResponse>> getStockForUserMedication(
             @PathVariable UUID medicationId,
@@ -93,5 +94,18 @@ public class UserMedicationStockController {
         );
 
         return ResponseEntity.ok(customPageResponse);
+    }
+
+    @GetMapping("/next-expiration/{medicationId}")
+    public ResponseEntity<LocalDateTime> getNextExpirationDateForUserMedication(
+            @PathVariable UUID medicationId) {
+
+        // Obtém o ID do usuário autenticado
+        UUID userId = currentUserProvider.getCurrentUserId();
+
+        // Cria um objeto Pageable com base nos parâmetros de paginação e ordenação
+        LocalDateTime nextExpirationDate = stockService.getStockForUserMedicationByUserIdAndMedicationId(userId, medicationId);
+
+        return ResponseEntity.ok(nextExpirationDate);
     }
 }
