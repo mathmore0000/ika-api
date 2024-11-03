@@ -52,6 +52,8 @@ public class MedicationService {
         medication.setMaxTakingTime(medicationRequest.getMaxTakingTime());
         medication.setTimeBetween(medicationRequest.getTimeBetween());
         medication.setBand(medicationRequest.getBand());
+        medication.setQuantityMl(medicationRequest.getQuantityMl());
+        medication.setQuantityInt(medicationRequest.getQuantityInt());
         medicationRepository.save(medication);
     }
 

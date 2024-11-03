@@ -28,4 +28,10 @@ public class MedicationRequest {
 
     @Min(value = 1, message = "band must be greater than or equal to 1")
     private int band;
+
+    @Min(value = 0, message = "quantityInt must be greater than or equal to 0")
+    private Integer quantityInt;
+
+    @Min(value = 0, message = "quantityMl must be greater than or equal to 0")
+    private Float quantityMl;
 }
