@@ -151,7 +151,7 @@ class MedicationControllerTest {
         medicationRequest.setCategoryId(getCategoryId("Antibiótico").getId());
         medicationRequest.setBand(3);
         medicationRequest.setTimeBetween(6);
-        medicationRequest.setMaxValidationTime(12);
+        medicationRequest.setMaxTakingTime(12);
 
         mockMvc.perform(post("/v1/medications")
                         .header("Authorization", "Bearer " + jwt)
@@ -172,7 +172,7 @@ class MedicationControllerTest {
         medication.setActiveIngredient(getActiveIngredientId("Clopidogrel"));
         medication.setCategory(getCategoryId("Antifúngico"));
         medication.setTimeBetween(8);
-        medication.setMaxValidationTime(24);
+        medication.setMaxTakingTime(24);
         medication = medicationRepository.save(medication);
 
         // Perform the GET request to retrieve the medication by ID

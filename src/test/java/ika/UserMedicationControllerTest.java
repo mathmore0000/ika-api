@@ -137,7 +137,7 @@ class UserMedicationControllerTest {
         UserMedicationRequest request = new UserMedicationRequest();
         request.setIdMedication(medicationId);
         request.setFirstDosageTime(LocalDateTime.now());
-        request.setMaxValidationTime(8.0f);
+        request.setMaxTakingTime(8.0f);
 
         mockMvc.perform(post("/v1/user-medications")
                         .header("Authorization", "Bearer " + jwt)
@@ -153,7 +153,7 @@ class UserMedicationControllerTest {
         UserMedicationRequest request = new UserMedicationRequest();
         request.setIdMedication(medicationId);
         request.setFirstDosageTime(LocalDateTime.now());
-        request.setMaxValidationTime(8.0f);
+        request.setMaxTakingTime(8.0f);
 
         // Create initial medication
         mockMvc.perform(post("/v1/user-medications")
@@ -172,8 +172,8 @@ class UserMedicationControllerTest {
 
     @Test
     void testUpdateUserMedicationStatusSuccess() throws Exception {
-        UUID userMedicationId = createUserMedication();
-        mockMvc.perform(patch("/v1/user-medications/" + userMedicationId + "/status")
+        UUID medicationId = createUserMedication();
+        mockMvc.perform(patch("/v1/user-medications/" + medicationId + "/status")
                         .param("disabled", "true")
                         .header("Authorization", "Bearer " + jwt))
                 .andExpect(status().isOk())
@@ -195,9 +195,9 @@ class UserMedicationControllerTest {
 
     @Test
     void testDeleteUserMedicationSuccess() throws Exception {
-        UUID userMedicationId = createUserMedication();
+        UUID medicationId = createUserMedication();
 
-        mockMvc.perform(delete("/v1/user-medications/" + userMedicationId)
+        mockMvc.perform(delete("/v1/user-medications/" + medicationId)
                         .header("Authorization", "Bearer " + jwt))
                 .andExpect(status().isNoContent());
     }
@@ -233,17 +233,17 @@ class UserMedicationControllerTest {
 
     @Test
     void testUpdateUserMedicationSuccess() throws Exception {
-        UUID userMedicationId = createUserMedication();
+        UUID medicationId = createUserMedication();
 
         UserMedicationRequest updatedRequest = new UserMedicationRequest();
         updatedRequest.setIdMedication(UUID.randomUUID());
         updatedRequest.setFirstDosageTime(LocalDateTime.now().plusHours(1));
-        updatedRequest.setMaxValidationTime(10.0f);
+        updatedRequest.setMaxTakingTime(10.0f);
         updatedRequest.setTimeBetween(12.0f);
         updatedRequest.setQuantityInt(10);
         updatedRequest.setQuantityMl(5.0f);
 
-        mockMvc.perform(put("/v1/user-medications/" + userMedicationId)
+        mockMvc.perform(put("/v1/user-medications/" + medicationId)
                         .header("Authorization", "Bearer " + jwt)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedRequest)))
@@ -263,7 +263,7 @@ class UserMedicationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.maxValidationTime").value(24.0))  // Verify default value from Medication
+                .andExpect(jsonPath("$.maxTakingTime").value(24.0))  // Verify default value from Medication
                 .andExpect(jsonPath("$.timeBetween").value(8.0))  // Verify default value from Medication
                 .andExpect(jsonPath("$.quantityMl").doesNotExist())  // Verify no default for ML because it's a solid medication
                 .andExpect(jsonPath("$.quantityInt").value(15));  // Verify default value from Medication
@@ -276,7 +276,7 @@ class UserMedicationControllerTest {
         UserMedicationRequest request = new UserMedicationRequest();
         request.setIdMedication(medicationId);
         request.setFirstDosageTime(LocalDateTime.now());
-        request.setMaxValidationTime(8.0f);
+        request.setMaxTakingTime(8.0f);
 
         mockMvc.perform(post("/v1/user-medications")
                         .header("Authorization", "Bearer " + jwt)
@@ -314,7 +314,7 @@ class UserMedicationControllerTest {
         request.setQuantityMl(quantityMl);
         request.setTimeBetween(timeBetween);
         request.setFirstDosageTime(firstDosageTime);
-        request.setMaxValidationTime(24.0f);  // You can also pass this as a parameter if needed
+        request.setMaxTakingTime(24.0f);  // You can also pass this as a parameter if needed
 
         // Perform the POST request to create a user medication with custom values
         mockMvc.perform(post("/v1/user-medications")

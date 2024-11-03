@@ -815,7 +815,7 @@ class UsageControllerTest {
         UserMedicationRequest request = new UserMedicationRequest();
         request.setIdMedication(medicationId);
         request.setFirstDosageTime(LocalDateTime.now());
-        request.setMaxValidationTime(8.0f);
+        request.setMaxTakingTime(8.0f);
 
         // Perform the POST request and capture the response
         String response = mockMvc.perform(post("/v1/user-medications")
