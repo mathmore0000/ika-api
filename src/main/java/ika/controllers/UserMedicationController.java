@@ -62,7 +62,7 @@ public class UserMedicationController {
     }
 
     // New endpoint to enable or disable a user medication
-    @PatchMapping("/{userMedicationId}/status")
+    @PatchMapping("/{medicationId}/status")
     public ResponseEntity<String> updateUserMedicationStatus(
             @Valid @NotNull(message="medicationId is required") @PathVariable UUID medicationId,
             @Valid @NotNull(message="disabled is required") @RequestParam boolean disabled) {

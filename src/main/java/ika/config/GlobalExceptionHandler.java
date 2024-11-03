@@ -42,14 +42,6 @@ public class GlobalExceptionHandler {
                 .body("Invalid parameter type: '" + ex.getValue() + "' for parameter '" + ex.getName() + "'.");
     }
 
-    @ExceptionHandler(MissingPathVariableException.class)
-    public ResponseEntity<String> handleMissingPathVariableException(MissingPathVariableException ex) {
-        // Para outros tipos de erros de conversão, retorna uma mensagem genérica
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ex.getMessage());
-    }
-
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<String> handleMaxSizeException(MaxUploadSizeExceededException ex) {
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("File size exceeds the limit of 64MB.");
