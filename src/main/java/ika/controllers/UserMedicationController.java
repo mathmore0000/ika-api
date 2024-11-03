@@ -6,6 +6,7 @@ import ika.entities.UserMedication;
 import ika.services.UserMedicationService;
 import ika.utils.CurrentUserProvider;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -63,27 +64,27 @@ public class UserMedicationController {
     // New endpoint to enable or disable a user medication
     @PatchMapping("/{userMedicationId}/status")
     public ResponseEntity<String> updateUserMedicationStatus(
-            @PathVariable UUID userMedicationId,
-            @RequestParam boolean disabled) {
+            @Valid @NotNull(message="medicationId is required") @PathVariable UUID medicationId,
+            @Valid @NotNull(message="disabled is required") @RequestParam boolean disabled) {
         UUID userId = currentUserProvider.getCurrentUserId();
-        UserMedication updatedMedication  = userMedicationService.updateUserMedicationStatus(userId, userMedicationId, disabled);
+        UserMedication updatedMedication  = userMedicationService.updateUserMedicationStatus(userId, medicationId, disabled);
         return ResponseEntity.ok("User medication status updated successfully");
     }
 
     // New endpoint to update a user medication
     @PutMapping("/{userMedicationId}")
     public ResponseEntity<UserMedication> updateUserMedication(
-            @PathVariable UUID userMedicationId,
+            @PathVariable UUID medicationId,
             @Valid @RequestBody UserMedicationRequest updatedRequest) {
         UUID userId = currentUserProvider.getCurrentUserId();
-        UserMedication updatedMedication = userMedicationService.updateUserMedication(userId, userMedicationId, updatedRequest);
+        UserMedication updatedMedication = userMedicationService.updateUserMedication(userId, medicationId, updatedRequest);
         return ResponseEntity.ok(updatedMedication);
     }
 
     @DeleteMapping("/{userMedicationId}")
-    public ResponseEntity<Void> deleteUserMedication(@PathVariable UUID userMedicationId) {
+    public ResponseEntity<Void> deleteUserMedication(@PathVariable UUID medicationId) {
         UUID userId = currentUserProvider.getCurrentUserId();
-        boolean isDeleted = userMedicationService.deleteUserMedication(userId, userMedicationId);
+        boolean isDeleted = userMedicationService.deleteUserMedication(userId, medicationId);
         return isDeleted ? ResponseEntity.noContent().build()
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }

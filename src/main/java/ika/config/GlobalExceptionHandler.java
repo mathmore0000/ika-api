@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import ika.utils.exceptions.ResourceNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body("Invalid parameter type: '" + ex.getValue() + "' for parameter '" + ex.getName() + "'.");
+    }
+
+    @ExceptionHandler(MissingPathVariableException.class)
+    public ResponseEntity<String> handleMissingPathVariableException(MissingPathVariableException ex) {
+        // Para outros tipos de erros de conversão, retorna uma mensagem genérica
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)

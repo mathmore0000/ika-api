@@ -63,8 +63,8 @@ public class UserMedicationService {
     }
 
     // Method to update the 'disabled' status of a user medication
-    public UserMedication updateUserMedicationStatus(UUID userId, UUID userMedicationId, boolean disabled) {
-        UserMedication userMedication = userMedicationRepository.findByUserIdAndMedicationId(userId, userMedicationId)
+    public UserMedication updateUserMedicationStatus(UUID userId, UUID medicationId, boolean disabled) {
+        UserMedication userMedication = userMedicationRepository.findByUserIdAndMedicationId(userId, medicationId)
                 .orElseThrow(() -> new ResourceNotFoundException("User medication not found"));
         userMedication.setDisabled(disabled);
         userMedicationRepository.save(userMedication);
@@ -72,8 +72,8 @@ public class UserMedicationService {
     }
 
     // Method to update a user medication with new details
-    public UserMedication updateUserMedication(UUID userId, UUID userMedicationId, UserMedicationRequest request) {
-        UserMedication existingUserMedication = userMedicationRepository.findByUserIdAndMedicationId(userId, userMedicationId)
+    public UserMedication updateUserMedication(UUID userId, UUID medicationId, UserMedicationRequest request) {
+        UserMedication existingUserMedication = userMedicationRepository.findByUserIdAndMedicationId(userId, medicationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Medication relation not found"));;
             UserMedication userMedication = existingUserMedication;
 
@@ -88,8 +88,8 @@ public class UserMedicationService {
             return userMedication;
     }
 
-    public boolean deleteUserMedication(UUID userId, UUID userMedicationId) {
-        Optional<UserMedication> userMedication = userMedicationRepository.findByUserIdAndMedicationId(userId, userMedicationId);
+    public boolean deleteUserMedication(UUID userId, UUID medicationId) {
+        Optional<UserMedication> userMedication = userMedicationRepository.findByUserIdAndMedicationId(userId, medicationId);
         if (userMedication.isPresent()) {
             userMedicationRepository.delete(userMedication.get());
             return true;
