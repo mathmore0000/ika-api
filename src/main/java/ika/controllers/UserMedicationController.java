@@ -81,7 +81,7 @@ public class UserMedicationController {
         return ResponseEntity.ok(updatedMedication);
     }
 
-    @DeleteMapping("/{userMedicationId}")
+    @DeleteMapping("/{medicationId}")
     public ResponseEntity<Void> deleteUserMedication(@PathVariable UUID medicationId) {
         UUID userId = currentUserProvider.getCurrentUserId();
         boolean isDeleted = userMedicationService.deleteUserMedication(userId, medicationId);
