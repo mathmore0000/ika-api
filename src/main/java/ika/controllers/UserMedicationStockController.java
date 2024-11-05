@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @RestController
@@ -41,7 +42,7 @@ public class UserMedicationStockController {
     @PatchMapping("/{stockId}")
     public ResponseEntity<UserMedicationStock> updateStock(
             @PathVariable UUID stockId,
-            @RequestParam(required = false) LocalDateTime expirationDate) {
+            @RequestParam(required = false) OffsetDateTime expirationDate) {
 
         UserMedicationStock updatedStock = stockService.updateStock(stockId, expirationDate);
         return ResponseEntity.ok(updatedStock);
@@ -97,14 +98,14 @@ public class UserMedicationStockController {
     }
 
     @GetMapping("/next-expiration/{medicationId}")
-    public ResponseEntity<LocalDateTime> getNextExpirationDateForUserMedication(
+    public ResponseEntity<OffsetDateTime> getNextExpirationDateForUserMedication(
             @PathVariable UUID medicationId) {
 
         // Obtém o ID do usuário autenticado
         UUID userId = currentUserProvider.getCurrentUserId();
 
         // Cria um objeto Pageable com base nos parâmetros de paginação e ordenação
-        LocalDateTime nextExpirationDate = stockService.getStockForUserMedicationByUserIdAndMedicationId(userId, medicationId);
+        OffsetDateTime nextExpirationDate = stockService.getStockForUserMedicationByUserIdAndMedicationId(userId, medicationId);
 
         return ResponseEntity.ok(nextExpirationDate);
     }

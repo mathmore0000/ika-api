@@ -31,7 +31,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -189,8 +189,8 @@ class UsageControllerTest {
                         .header("Authorization", "Bearer " + jwt)
                         .param("page", "0")
                         .param("size", "10")
-                        .param("fromDate", LocalDateTime.now().minusDays(1).toString())
-                        .param("toDate", LocalDateTime.now().toString())
+                        .param("fromDate", OffsetDateTime.now().minusDays(1).toString())
+                        .param("toDate", OffsetDateTime.now().toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(usageId.toString()))
@@ -229,8 +229,8 @@ class UsageControllerTest {
                         .header("Authorization", "Bearer " + jwt)
                         .param("page", "0")
                         .param("size", "10")
-                        .param("fromDate", LocalDateTime.now().minusDays(1).toString())
-                        .param("toDate", LocalDateTime.now().toString())
+                        .param("fromDate", OffsetDateTime.now().minusDays(1).toString())
+                        .param("toDate", OffsetDateTime.now().toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(usageId.toString()))
@@ -270,7 +270,7 @@ class UsageControllerTest {
         medicationStockRequest.setQuantityMl(null);
 
         request.setMedications(List.of(medicationStockRequest));
-        request.setActionTmstamp(LocalDateTime.now());
+        request.setActionTmstamp(OffsetDateTime.now());
 
         MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
         MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
@@ -294,7 +294,7 @@ class UsageControllerTest {
         medicationStockRequest.setQuantityMl(null);
 
         request.setMedications(List.of(medicationStockRequest));
-        request.setActionTmstamp(LocalDateTime.now());
+        request.setActionTmstamp(OffsetDateTime.now());
 
         MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
         MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
@@ -349,7 +349,7 @@ class UsageControllerTest {
         UsageRequest.MedicationStockRequest medicationStockRequest = new UsageRequest.MedicationStockRequest();
         medicationStockRequest.setMedicationStockId(userMedicationStockId);
         request.setMedications(List.of(medicationStockRequest));
-        request.setActionTmstamp(LocalDateTime.now());
+        request.setActionTmstamp(OffsetDateTime.now());
 
         UserMedication userMedication = userMedicationRepository.findById(userMedicationId).orElseThrow();
         userMedication.getMedication().setQuantityInt(-10);
@@ -376,7 +376,7 @@ class UsageControllerTest {
         UsageRequest.MedicationStockRequest medicationStockRequest = new UsageRequest.MedicationStockRequest();
         medicationStockRequest.setMedicationStockId(userMedicationStockId);
         request.setMedications(List.of(medicationStockRequest));
-        request.setActionTmstamp(LocalDateTime.now());
+        request.setActionTmstamp(OffsetDateTime.now());
 
         UserMedication userMedication = userMedicationRepository.findById(userMedicationId).orElseThrow();
         userMedication.getMedication().setQuantityInt(0);
@@ -428,7 +428,7 @@ class UsageControllerTest {
         medicationStockRequest.setMedicationStockId(userMedicationStockId);
         medicationStockRequest.setQuantityInt(1000); // Excedendo o estoque disponível
         request.setMedications(List.of(medicationStockRequest));
-        request.setActionTmstamp(LocalDateTime.now());
+        request.setActionTmstamp(OffsetDateTime.now());
 
         // Configurar os arquivos do mock
         MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
@@ -458,7 +458,7 @@ class UsageControllerTest {
         medicationStockRequest.setMedicationStockId(userMedicationStockId);
         medicationStockRequest.setQuantityMl(1000f); // Excedendo o estoque disponível
         request.setMedications(List.of(medicationStockRequest));
-        request.setActionTmstamp(LocalDateTime.now());
+        request.setActionTmstamp(OffsetDateTime.now());
 
         // Configurar os arquivos do mock
         MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
@@ -481,7 +481,7 @@ class UsageControllerTest {
         medicationStockRequest.setMedicationStockId(userMedicationStockId);
         medicationStockRequest.setQuantityInt(-1); // Valor inválido para quantidade int
         request.setMedications(List.of(medicationStockRequest));
-        request.setActionTmstamp(LocalDateTime.now());
+        request.setActionTmstamp(OffsetDateTime.now());
 
         // Configurar os arquivos do mock
         MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
@@ -514,7 +514,7 @@ class UsageControllerTest {
         medicationStockRequest.setQuantityInt(15); // Excedendo o estoque, só temos 10 disponíveis
         medicationStockRequest.setQuantityMl(null);
         request.setMedications(List.of(medicationStockRequest));
-        request.setActionTmstamp(LocalDateTime.now());
+        request.setActionTmstamp(OffsetDateTime.now());
 
         MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
         MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
@@ -542,7 +542,7 @@ class UsageControllerTest {
         medicationStockRequest.setQuantityInt(0);
         medicationStockRequest.setQuantityMl(5.0f); // Passando quantidade ml para um medicamento sólido
         request.setMedications(List.of(medicationStockRequest));
-        request.setActionTmstamp(LocalDateTime.now());
+        request.setActionTmstamp(OffsetDateTime.now());
 
         MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
         MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
@@ -570,7 +570,7 @@ class UsageControllerTest {
         medicationStockRequest.setQuantityInt(null);
         medicationStockRequest.setQuantityMl(-5.0f); // Passando quantidade ml negativa
         request.setMedications(List.of(medicationStockRequest));
-        request.setActionTmstamp(LocalDateTime.now());
+        request.setActionTmstamp(OffsetDateTime.now());
 
         MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
         MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
@@ -779,7 +779,7 @@ class UsageControllerTest {
         medicationStockRequest.setQuantityMl(null);
 
         request.setMedications(List.of(medicationStockRequest));
-        request.setActionTmstamp(LocalDateTime.now());
+        request.setActionTmstamp(OffsetDateTime.now());
 
         MockMultipartFile file = new MockMultipartFile("file", "dummy-video.mp4", "video/mp4", "dummy content".getBytes());
         MockMultipartFile usageRequestPart = new MockMultipartFile("usageRequest", "usageRequest", "application/json", objectMapper.writeValueAsString(request).getBytes());
@@ -814,7 +814,7 @@ class UsageControllerTest {
     private UUID createUserMedication(UUID medicationId) throws Exception {
         UserMedicationRequest request = new UserMedicationRequest();
         request.setIdMedication(medicationId);
-        request.setFirstDosageTime(LocalDateTime.now());
+        request.setFirstDosageTime(OffsetDateTime.now());
         request.setMaxTakingTime(8.0f);
 
         // Perform the POST request and capture the response
@@ -839,7 +839,7 @@ class UsageControllerTest {
         UserMedicationStockRequest stockRequest = new UserMedicationStockRequest();
         stockRequest.setUserMedicationId(userMedicationId);
         stockRequest.setQuantityStocked(10);
-        stockRequest.setExpirationDate(LocalDateTime.now().plusDays(30)); // Set expiration date 30 days ahead
+        stockRequest.setExpirationDate(OffsetDateTime.now().plusDays(30)); // Set expiration date 30 days ahead
 
         // Perform the POST request to create the stock and capture the response
         String response = mockMvc.perform(post("/v1/user-medication-stocks")

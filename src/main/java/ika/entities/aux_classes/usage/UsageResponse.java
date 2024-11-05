@@ -8,6 +8,7 @@ import ika.entities.aux_classes.medication.MedicationResponse;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -18,7 +19,7 @@ public class UsageResponse {
     private List<UserMedicationStockWithUsageResponse> userMedicationStockResponses;
     private Boolean isApproved;
     private FileEntity video;
-    private LocalDateTime actionTmstamp;
+    private OffsetDateTime actionTmstamp;
 
     public UsageResponse(Usage usage) {
         this.id = usage.getId();
@@ -39,8 +40,8 @@ public class UsageResponse {
         private UUID id; // ID do estoque de medicação
         private MedicationResponse medicationResponse; // Medicamento associado
         private Integer quantityStocked; // Quantidade em estoque
-        private LocalDateTime stockedAt; // Data de estocagem
-        private LocalDateTime expirationDate; // Data de validade
+        private OffsetDateTime stockedAt; // Data de estocagem
+        private OffsetDateTime expirationDate; // Data de validade
 
         private List<StockUsageResponse> usages; // Lista de usos para este estoque
 
@@ -65,7 +66,7 @@ public class UsageResponse {
     @Data
     public static class StockUsageResponse {
         private Integer quantityUsed; // Quantidade usada
-        private LocalDateTime usageTimestamp; // Data do uso
+        private OffsetDateTime usageTimestamp; // Data do uso
 
         public StockUsageResponse(UserMedicationStockUsage stockUsage) {
             this.quantityUsed = stockUsage.getQuantityInt(); // ou quantityMl se aplicável

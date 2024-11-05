@@ -25,6 +25,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -141,7 +142,7 @@ class UserMedicationStockControllerTest {
         UserMedicationStockRequest request = new UserMedicationStockRequest();
         request.setUserMedicationId(userMedicationId);
         request.setQuantityStocked(10);
-        request.setExpirationDate(LocalDateTime.now().plusDays(30));
+        request.setExpirationDate(OffsetDateTime.now().plusDays(30));
 
         // Send the request as JSON
         mockMvc.perform(post("/v1/user-medication-stocks")
@@ -197,7 +198,7 @@ class UserMedicationStockControllerTest {
     private UUID createUserMedication(UUID medicationId) throws Exception {
         UserMedicationRequest request = new UserMedicationRequest();
         request.setIdMedication(medicationId);
-        request.setFirstDosageTime(LocalDateTime.now());
+        request.setFirstDosageTime(OffsetDateTime.now());
         request.setMaxTakingTime(8.0f);
 
         // Perform the POST request and capture the response
@@ -223,7 +224,7 @@ class UserMedicationStockControllerTest {
         UserMedicationStockRequest stockRequest = new UserMedicationStockRequest();
         stockRequest.setUserMedicationId(userMedicationId);
         stockRequest.setQuantityStocked(10);
-        stockRequest.setExpirationDate(LocalDateTime.now().plusDays(30)); // Set expiration date 30 days ahead
+        stockRequest.setExpirationDate(OffsetDateTime.now().plusDays(30)); // Set expiration date 30 days ahead
 
         // Perform the POST request to create the stock and capture the response
         String response = mockMvc.perform(post("/v1/user-medication-stocks")

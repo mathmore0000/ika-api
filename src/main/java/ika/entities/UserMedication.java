@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -38,13 +39,13 @@ public class UserMedication {
     private float timeBetween;
 
     @Column(name = "first_dosage_time", nullable = false)
-    private LocalDateTime firstDosageTime;
+    private OffsetDateTime firstDosageTime;
 
     @Column(name = "max_taking_time", nullable = false)
     private float maxTakingTime;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     // Default constructor
     public UserMedication() {}

@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 @RestController
@@ -95,7 +96,7 @@ public class AuthController {
                 .locale(signUpRequest.getLocale())
                 .role(defaultRole)
                 .metadata("{}")
-                .createdAt(LocalDateTime.now())
+                .createdAt(OffsetDateTime.now())
                 .build();
 
         userService.createUser(newUser);

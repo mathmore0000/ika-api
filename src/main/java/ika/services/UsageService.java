@@ -20,6 +20,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -201,12 +202,12 @@ public class UsageService {
         }
     }
 
-    public Page<UsageResponse> getFilteredUsagesByUser(UUID userId, Boolean isApproved, LocalDateTime fromDate, LocalDateTime toDate, Pageable pageable) {
+    public Page<UsageResponse> getFilteredUsagesByUser(UUID userId, Boolean isApproved, OffsetDateTime fromDate, OffsetDateTime toDate, Pageable pageable) {
         // O repositório fará a filtragem com base nos parâmetros e na paginação
         return usageRepository.findAllWithFiltersByUserId(userId, isApproved, fromDate, toDate, pageable).map(this::convertToUsageResponse);
     }
 
-    public Page<UsageResponse> getFilteredUsagesByResponsible(UUID responsibled, Boolean isApproved, LocalDateTime fromDate, LocalDateTime toDate, Pageable pageable) {
+    public Page<UsageResponse> getFilteredUsagesByResponsible(UUID responsibled, Boolean isApproved, OffsetDateTime fromDate, OffsetDateTime toDate, Pageable pageable) {
         // O repositório fará a filtragem com base nos parâmetros e na paginação
         return usageRepository.findAllWithFiltersByResponsibleId(responsibled, isApproved, fromDate, toDate, pageable).map(this::convertToUsageResponse);
     }

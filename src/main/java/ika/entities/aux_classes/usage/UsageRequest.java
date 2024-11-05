@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,7 +16,7 @@ import java.util.UUID;
 public class UsageRequest {
 
     @NotNull(message = "Action timestamp is required")
-    private LocalDateTime actionTmstamp;
+    private OffsetDateTime actionTmstamp;
 
     @NotNull(message = "Medications are required")
     @Size(max = 30, message = "A maximum of 30 medications are allowed at once")

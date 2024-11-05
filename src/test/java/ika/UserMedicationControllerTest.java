@@ -27,6 +27,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -136,7 +137,7 @@ class UserMedicationControllerTest {
 
         UserMedicationRequest request = new UserMedicationRequest();
         request.setIdMedication(medicationId);
-        request.setFirstDosageTime(LocalDateTime.now());
+        request.setFirstDosageTime(OffsetDateTime.now());
         request.setMaxTakingTime(8.0f);
 
         mockMvc.perform(post("/v1/user-medications")
@@ -152,7 +153,7 @@ class UserMedicationControllerTest {
 
         UserMedicationRequest request = new UserMedicationRequest();
         request.setIdMedication(medicationId);
-        request.setFirstDosageTime(LocalDateTime.now());
+        request.setFirstDosageTime(OffsetDateTime.now());
         request.setMaxTakingTime(8.0f);
 
         // Create initial medication
@@ -214,8 +215,8 @@ class UserMedicationControllerTest {
         UUID medicationId1 = createMedication("Paracetamol 500mg", "Paracetamol", "Antipirético");
         UUID medicationId2 = createMedication("Ibuprofen 400mg", "Ibuprofen", "Anti-inflamatório");
 
-        createUserMedicationWithCustomValues(medicationId1, 5, 250.0f, 6.0f, LocalDateTime.now().minusDays(1));
-        createUserMedicationWithCustomValues(medicationId2, 10, 500.0f, 8.0f, LocalDateTime.now());
+        createUserMedicationWithCustomValues(medicationId1, 5, 250.0f, 6.0f, OffsetDateTime.now().minusDays(1));
+        createUserMedicationWithCustomValues(medicationId2, 10, 500.0f, 8.0f, OffsetDateTime.now());
 
         // Perform the GET request to retrieve user medications with pagination and sorting
         mockMvc.perform(get("/v1/user-medications")
@@ -237,7 +238,7 @@ class UserMedicationControllerTest {
 
         UserMedicationRequest updatedRequest = new UserMedicationRequest();
         updatedRequest.setIdMedication(UUID.randomUUID());
-        updatedRequest.setFirstDosageTime(LocalDateTime.now().plusHours(1));
+        updatedRequest.setFirstDosageTime(OffsetDateTime.now().plusHours(1));
         updatedRequest.setMaxTakingTime(10.0f);
         updatedRequest.setTimeBetween(12.0f);
         updatedRequest.setQuantityInt(10);
@@ -256,7 +257,7 @@ class UserMedicationControllerTest {
 
         UserMedicationRequest request = new UserMedicationRequest();
         request.setIdMedication(medicationId);
-        request.setFirstDosageTime(LocalDateTime.now());
+        request.setFirstDosageTime(OffsetDateTime.now());
 
         mockMvc.perform(post("/v1/user-medications")
                         .header("Authorization", "Bearer " + jwt)
@@ -275,7 +276,7 @@ class UserMedicationControllerTest {
 
         UserMedicationRequest request = new UserMedicationRequest();
         request.setIdMedication(medicationId);
-        request.setFirstDosageTime(LocalDateTime.now());
+        request.setFirstDosageTime(OffsetDateTime.now());
         request.setMaxTakingTime(8.0f);
 
         mockMvc.perform(post("/v1/user-medications")
@@ -307,7 +308,7 @@ class UserMedicationControllerTest {
         )).getId();
     }
 
-    private UUID createUserMedicationWithCustomValues(UUID medicationId, int quantityInt, float quantityMl, float timeBetween, LocalDateTime firstDosageTime) throws Exception {
+    private UUID createUserMedicationWithCustomValues(UUID medicationId, int quantityInt, float quantityMl, float timeBetween, OffsetDateTime firstDosageTime) throws Exception {
         UserMedicationRequest request = new UserMedicationRequest();
         request.setIdMedication(medicationId);
         request.setQuantityInt(quantityInt);

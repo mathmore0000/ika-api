@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,13 +26,13 @@ public class UserMedicationStock {
     private int quantityStocked;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @Column(name = "stocked_at", nullable = false)
-    private LocalDateTime stockedAt;
+    private OffsetDateTime stockedAt;
 
     @Column(name = "expiration_date", nullable = false)
-    private LocalDateTime expirationDate;
+    private OffsetDateTime expirationDate;
 
     @OneToMany(mappedBy = "userMedicationStock", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserMedicationStockUsage> stockUsages;

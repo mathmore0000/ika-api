@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -16,5 +17,5 @@ public class UserMedicationStockRequest {
     private Integer quantityStocked;
 
     @NotNull(message = "expirationDate is required")
-    private LocalDateTime expirationDate;
+    private OffsetDateTime expirationDate;
 }

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,7 +19,7 @@ public interface UsageRepository extends JpaRepository<Usage, UUID> {
             "(:isApproved IS NULL OR u.isApproved = :isApproved) AND " +
             "(cast(:fromDate as timestamp) IS NULL OR u.actionTmstamp >= :fromDate) AND " +
             "(cast(:toDate as timestamp) IS NULL OR u.actionTmstamp <= :toDate)")
-    Page<Usage> findAllWithFiltersByUserId(UUID userId, Boolean isApproved, LocalDateTime fromDate, LocalDateTime toDate, Pageable pageable);
+    Page<Usage> findAllWithFiltersByUserId(UUID userId, Boolean isApproved, OffsetDateTime fromDate, OffsetDateTime toDate, Pageable pageable);
 
     @Query("SELECT u FROM Usage u " +
             "JOIN UserResponsible ur ON u.userId = ur.userId " +
@@ -27,7 +28,7 @@ public interface UsageRepository extends JpaRepository<Usage, UUID> {
             "(:isApproved IS NULL OR u.isApproved = :isApproved) AND " +
             "(cast(:fromDate as timestamp) IS NULL OR u.actionTmstamp >= :fromDate) AND " +
             "(cast(:toDate as timestamp) IS NULL OR u.actionTmstamp <= :toDate)")
-    Page<Usage> findAllWithFiltersByResponsibleId(UUID responsibleId, Boolean isApproved, LocalDateTime fromDate, LocalDateTime toDate, Pageable pageable);
+    Page<Usage> findAllWithFiltersByResponsibleId(UUID responsibleId, Boolean isApproved, OffsetDateTime fromDate, OffsetDateTime toDate, Pageable pageable);
 
     Optional<Usage> findByIdAndUserId(UUID id, UUID user_id);
 }

@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +46,7 @@ public class FileService {
     private CurrentUserProvider currentUserProvider;
 
     public FileEntity uploadFile(String bucketDescription, MultipartFile file) throws Exception {
-        LocalDateTime localDateTimeNow= LocalDateTime.now();
+        OffsetDateTime localDateTimeNow = OffsetDateTime.now();
         String originalFilename = file.getOriginalFilename();
         String fileName = originalFilename + "-" + currentUserProvider.getCurrentUserId().toString()+"-"+localDateTimeNow.toString();
         System.out.println(fileName);
@@ -76,7 +77,7 @@ public class FileService {
         return fileEntity;
     }
 
-    private FileEntity insertFile(String fileName, LocalDateTime localDateTimeNow, String fileType, Bucket bucket) {
+    private FileEntity insertFile(String fileName, OffsetDateTime localDateTimeNow, String fileType, Bucket bucket) {
         FileEntity fileEntity = new FileEntity();
         fileEntity.setName(fileName);
         fileEntity.setCreatedAt(localDateTimeNow);

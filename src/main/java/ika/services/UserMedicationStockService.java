@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,21 +35,21 @@ public class UserMedicationStockService {
     @Autowired
     private UserMedicationStockUsageService userMedicationStockUsageService;
 
-    public UserMedicationStock addStock(UUID userMedicationId, int quantityStocked, LocalDateTime expirationDate) {
+    public UserMedicationStock addStock(UUID userMedicationId, int quantityStocked, OffsetDateTime expirationDate) {
         UserMedication userMedication = userMedicationRepository.findById(userMedicationId)
                 .orElseThrow(() -> new ResourceNotFoundException("User medication not found"));
 
         UserMedicationStock stock = new UserMedicationStock();
         stock.setUserMedication(userMedication);
         stock.setQuantityStocked(quantityStocked);
-        stock.setCreatedAt(LocalDateTime.now());
-        stock.setStockedAt(LocalDateTime.now());
+        stock.setCreatedAt(OffsetDateTime.now());
+        stock.setStockedAt(OffsetDateTime.now());
         stock.setExpirationDate(expirationDate);
 
         return stockRepository.save(stock);
     }
 
-    public UserMedicationStock updateStock(UUID stockId, LocalDateTime expirationDate) {
+    public UserMedicationStock updateStock(UUID stockId, OffsetDateTime expirationDate) {
         UserMedicationStock stock = stockRepository.findById(stockId)
                 .orElseThrow(() -> new ResourceNotFoundException("Stock not found"));
 
@@ -66,7 +67,7 @@ public class UserMedicationStockService {
 
     public AvailableStockResponse getAvailableStock(UUID userId, UUID medicationId) {
         // Obter todos os estoques não vencidos para a medicação e usuário especificados
-        List<UserMedicationStock> validStocks = stockRepository.findAllByUserIdAndMedicationIdAndNotExpired(userId, medicationId, LocalDateTime.now());
+        List<UserMedicationStock> validStocks = stockRepository.findAllByUserIdAndMedicationIdAndNotExpired(userId, medicationId, OffsetDateTime.now());
 
         if (validStocks.isEmpty()) {
             return new AvailableStockResponse("unknown", 0);
@@ -145,14 +146,14 @@ public class UserMedicationStockService {
         return totalAvailableInt;
     }
 
-    public LocalDateTime getStockForUserMedicationByUserIdAndMedicationId(UUID userId, UUID medicationId) {
-        List<UserMedicationStock> validStocks = stockRepository.findAllByUserIdAndMedicationIdAndNotExpiredOrderedByExpirationDate(userId, medicationId, LocalDateTime.now());
+    public OffsetDateTime getStockForUserMedicationByUserIdAndMedicationId(UUID userId, UUID medicationId) {
+        List<UserMedicationStock> validStocks = stockRepository.findAllByUserIdAndMedicationIdAndNotExpiredOrderedByExpirationDate(userId, medicationId, OffsetDateTime.now());
 
         if (validStocks.isEmpty()) {
             return null;
         }
         UserMedication userMedication = validStocks.get(0).getUserMedication();
-        LocalDateTime nextExpirationDate = null;
+        OffsetDateTime nextExpirationDate = null;
         if (userMedication.getQuantityMl() != null && userMedication.getQuantityMl() > 0) {
             nextExpirationDate = findNextExpirationDateQuantityMl(validStocks);
         } else if (userMedication.getQuantityInt() != null && userMedication.getQuantityInt() > 0) {
@@ -163,7 +164,7 @@ public class UserMedicationStockService {
 
     }
 
-    private LocalDateTime findNextExpirationDateQuantityMl(List<UserMedicationStock> validStocks) {
+    private OffsetDateTime findNextExpirationDateQuantityMl(List<UserMedicationStock> validStocks) {
         for (UserMedicationStock stock : validStocks) {
             int quantityStocked = stock.getQuantityStocked();
             Float quantityPerUnit = stock.getUserMedication().getQuantityMl();
@@ -184,7 +185,7 @@ public class UserMedicationStockService {
         return null;
     }
 
-    private LocalDateTime findNextExpirationDateQuantityInt(List<UserMedicationStock> validStocks) {
+    private OffsetDateTime findNextExpirationDateQuantityInt(List<UserMedicationStock> validStocks) {
         for (UserMedicationStock stock : validStocks) {
             int quantityStocked = stock.getQuantityStocked();
             Integer quantityPerUnit = stock.getUserMedication().getQuantityInt();

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -20,8 +21,8 @@ public class UserMedicationRequest {
     private float timeBetween;
 
     @NotNull(message = "firstDosageTime is required")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss") // Specify the format for parsing
-    private LocalDateTime firstDosageTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") // Specify the format for parsing
+    private OffsetDateTime firstDosageTime;
 
     private float maxTakingTime;
 }

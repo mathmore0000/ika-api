@@ -5,6 +5,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
@@ -46,13 +47,13 @@ public class User {
     private boolean disabled = false;
 
     @Column(name = "birth_date")
-    private LocalDateTime birthDate;
+    private OffsetDateTime birthDate;
 
     @Column(name = "last_seen")
-    private LocalDateTime lastSeen;
+    private OffsetDateTime lastSeen;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private OffsetDateTime createdAt = OffsetDateTime.now();
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "metadata", columnDefinition = "jsonb")

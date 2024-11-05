@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -37,7 +38,7 @@ public class UserResponsible {
     private Boolean accepted = false;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private OffsetDateTime createdAt = OffsetDateTime.now();
 
     // Construtor para inicializar `user` e `responsible`
     public UserResponsible(User user, User responsible) {
@@ -45,7 +46,7 @@ public class UserResponsible {
         this.responsible = responsible;
         this.userId = user.getId(); // Inicializa `userId` com o ID do usuário
         this.responsibleId = responsible.getId(); // Inicializa `responsibleId` com o ID do responsável
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = OffsetDateTime.now();
     }
 
     // Classe interna representando a chave composta

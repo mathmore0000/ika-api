@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,8 +20,8 @@ public interface UserMedicationStockRepository extends JpaRepository<UserMedicat
     List<UserMedicationStock> findAllByUserIdAndMedicationIds(UUID userId, List<UUID> medicationIds);
 
     @Query("SELECT ums FROM UserMedicationStock ums WHERE ums.userMedication.user.id = :userId AND ums.userMedication.medication.id = :medicationId AND ums.expirationDate >= :currentDate")
-    List<UserMedicationStock> findAllByUserIdAndMedicationIdAndNotExpired(@Param("userId") UUID userId, @Param("medicationId") UUID medicationId, @Param("currentDate") LocalDateTime currentDate);
+    List<UserMedicationStock> findAllByUserIdAndMedicationIdAndNotExpired(@Param("userId") UUID userId, @Param("medicationId") UUID medicationId, @Param("currentDate") OffsetDateTime currentDate);
 
     @Query("SELECT ums FROM UserMedicationStock ums WHERE ums.userMedication.user.id = :userId AND ums.userMedication.medication.id = :medicationId AND ums.expirationDate >= :currentDate order by ums.expirationDate")
-    List<UserMedicationStock> findAllByUserIdAndMedicationIdAndNotExpiredOrderedByExpirationDate(@Param("userId") UUID userId, @Param("medicationId") UUID medicationId, @Param("currentDate") LocalDateTime currentDate);
+    List<UserMedicationStock> findAllByUserIdAndMedicationIdAndNotExpiredOrderedByExpirationDate(@Param("userId") UUID userId, @Param("medicationId") UUID medicationId, @Param("currentDate") OffsetDateTime currentDate);
 }

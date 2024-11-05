@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +20,7 @@ public class Usage {
     @Column(name = "id_user", nullable = false)
     private UUID userId;
     @Column(name = "action_tmstamp", nullable = false)
-    private LocalDateTime actionTmstamp;
+    private OffsetDateTime actionTmstamp;
     @Column(name = "is_approved")
     private Boolean isApproved;
     @Column(name = "obs")
