@@ -5,6 +5,7 @@ import ika.entities.aux_classes.user_medication_stock.AvailableStockResponse;
 import ika.entities.aux_classes.user_medication_stock.UserMedicationStockRequest;
 import ika.entities.aux_classes.user_medication_stock.UserMedicationStockResponse;
 import ika.entities.UserMedicationStock;
+import ika.entities.aux_classes.user_medication_stock.UserMedicationStockWithQuantityResponse;
 import ika.services.UserMedicationStockService;
 import ika.utils.CurrentUserProvider;
 import jakarta.validation.Valid;
@@ -55,7 +56,7 @@ public class UserMedicationStockController {
     }
 
     @GetMapping("/valid/{medicationId}")
-    public ResponseEntity<CustomPageResponse<UserMedicationStockResponse>> getValidStocksWithAvailableQuantity(
+    public ResponseEntity<CustomPageResponse<UserMedicationStockWithQuantityResponse>> getValidStocksWithAvailableQuantity(
             @PathVariable UUID medicationId,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
@@ -65,9 +66,9 @@ public class UserMedicationStockController {
         UUID userId = currentUserProvider.getCurrentUserId();
         Pageable pageable = CustomPageResponse.createPageableWithSort(page, size, sortBy, sortDirection);
 
-        Page<UserMedicationStockResponse> validStocksPage = stockService.getValidStocksWithAvailableQuantity(userId, medicationId, pageable);
+        Page<UserMedicationStockWithQuantityResponse> validStocksPage = stockService.getValidStocksWithAvailableQuantity(userId, medicationId, pageable);
 
-        CustomPageResponse<UserMedicationStockResponse> customPageResponse = new CustomPageResponse<>(
+        CustomPageResponse<UserMedicationStockWithQuantityResponse> customPageResponse = new CustomPageResponse<>(
                 validStocksPage.getContent(),
                 validStocksPage.getNumber(),
                 validStocksPage.getSize(),
