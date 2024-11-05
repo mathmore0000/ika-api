@@ -21,7 +21,7 @@ public class UserMedicationRequest {
     private float timeBetween;
 
     @NotNull(message = "firstDosageTime is required")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") // Specify the format for parsing
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     private OffsetDateTime firstDosageTime;
 
     private float maxTakingTime;
