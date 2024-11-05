@@ -24,4 +24,22 @@ public interface UserMedicationStockRepository extends JpaRepository<UserMedicat
 
     @Query("SELECT ums FROM UserMedicationStock ums WHERE ums.userMedication.user.id = :userId AND ums.userMedication.medication.id = :medicationId AND ums.expirationDate >= :currentDate order by ums.expirationDate")
     List<UserMedicationStock> findAllByUserIdAndMedicationIdAndNotExpiredOrderedByExpirationDate(@Param("userId") UUID userId, @Param("medicationId") UUID medicationId, @Param("currentDate") OffsetDateTime currentDate);
+
+    @Query("SELECT ums FROM UserMedicationStock ums " +
+            "WHERE ums.userMedication.user.id = :userId " +
+            "AND ums.userMedication.medication.id = :medicationId " +
+            "AND ums.expirationDate >= :currentDate " +
+            "AND (" +
+            " (ums.quantityStocked * COALESCE(ums.userMedication.quantityMl, 0) - " +
+            " COALESCE((SELECT SUM(u.quantityMl) FROM UserMedicationStockUsage u WHERE u.userMedicationStock.id = ums.id), 0) > 0) " +
+            " OR " +
+            " (ums.quantityStocked * COALESCE(ums.userMedication.quantityInt, 0) - " +
+            " COALESCE((SELECT SUM(u.quantityInt) FROM UserMedicationStockUsage u WHERE u.userMedicationStock.id = ums.id), 0) > 0) " +
+            ")")
+    Page<UserMedicationStock> findAllValidStocksWithAvailableQuantity(
+            @Param("userId") UUID userId,
+            @Param("medicationId") UUID medicationId,
+            @Param("currentDate") OffsetDateTime currentDate,
+            Pageable pageable);
+
 }

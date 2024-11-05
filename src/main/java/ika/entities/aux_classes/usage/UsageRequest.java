@@ -1,5 +1,6 @@
 package ika.entities.aux_classes.usage;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class UsageRequest {
 
     @NotNull(message = "Action timestamp is required")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     private OffsetDateTime actionTmstamp;
 
     @NotNull(message = "Medications are required")

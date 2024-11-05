@@ -1,21 +1,19 @@
 package ika.services;
 
-import ika.entities.Medication;
 import ika.entities.aux_classes.user_medication_stock.AvailableStockResponse;
 import ika.entities.aux_classes.user_medication_stock.UserMedicationStockResponse;
 import ika.entities.UserMedication;
 import ika.entities.UserMedicationStock;
+import ika.entities.aux_classes.user_medication_stock.UserMedicationStockWithQuantityResponse;
 import ika.repositories.UserMedicationRepository;
 import ika.repositories.UserMedicationStockRepository;
 import ika.repositories.UserMedicationStockUsageRepository;
 import ika.utils.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -64,6 +62,36 @@ public class UserMedicationStockService {
 
         stockRepository.delete(stock);
     }
+
+    public Page<UserMedicationStockWithQuantityResponse> getValidStocksWithAvailableQuantity(UUID userId, UUID medicationId, Pageable pageable) {
+        OffsetDateTime currentDate = OffsetDateTime.now();
+        Page<UserMedicationStock> validStocks = stockRepository.findAllValidStocksWithAvailableQuantity(userId, medicationId, currentDate, pageable);
+
+        return validStocks.map(stock -> {
+            Number availableQuantity = calculateAvailableQuantity(stock);
+            return new UserMedicationStockWithQuantityResponse(
+                    stock.getId(),
+                    availableQuantity,
+                    stock.getQuantityStocked(),
+                    stock.getStockedAt(),
+                    stock.getExpirationDate()
+            );
+        });
+    }
+
+    private Number calculateAvailableQuantity(UserMedicationStock stock) {
+        if (stock.getUserMedication().getQuantityMl() > 0) {
+            float stockTotalMl = stock.getQuantityStocked() * stock.getUserMedication().getQuantityMl();
+            float usedMl = usageRepository.sumQuantityMlByMedicationStockId(stock.getId()).orElse(0f);
+            return stockTotalMl - usedMl;
+        } else if (stock.getUserMedication().getQuantityInt() > 0) {
+            int stockTotalInt = stock.getQuantityStocked() * stock.getUserMedication().getQuantityInt();
+            int usedInt = usageRepository.sumQuantityIntByMedicationStockId(stock.getId()).orElse(0);
+            return stockTotalInt - usedInt;
+        }
+        return 0;
+    }
+
 
     public AvailableStockResponse getAvailableStock(UUID userId, UUID medicationId) {
         // Obter todos os estoques não vencidos para a medicação e usuário especificados

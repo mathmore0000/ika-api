@@ -54,6 +54,32 @@ public class UserMedicationStockController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/valid/{medicationId}")
+    public ResponseEntity<CustomPageResponse<UserMedicationStockResponse>> getValidStocksWithAvailableQuantity(
+            @PathVariable UUID medicationId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sortBy", defaultValue = "expirationDate") String sortBy,
+            @RequestParam(value = "sortDirection", defaultValue = "asc") String sortDirection) {
+
+        UUID userId = currentUserProvider.getCurrentUserId();
+        Pageable pageable = CustomPageResponse.createPageableWithSort(page, size, sortBy, sortDirection);
+
+        Page<UserMedicationStockResponse> validStocksPage = stockService.getValidStocksWithAvailableQuantity(userId, medicationId, pageable);
+
+        CustomPageResponse<UserMedicationStockResponse> customPageResponse = new CustomPageResponse<>(
+                validStocksPage.getContent(),
+                validStocksPage.getNumber(),
+                validStocksPage.getSize(),
+                validStocksPage.getSort(),
+                validStocksPage.getPageable().getOffset(),
+                validStocksPage.getTotalPages()
+        );
+
+        return ResponseEntity.ok(customPageResponse);
+    }
+
+
     @GetMapping("/allStock/{medicationId}")
     public ResponseEntity<AvailableStockResponse> getAllStockForUserMedication(
             @PathVariable UUID medicationId) {
