@@ -131,6 +131,7 @@ public class UsageController {
         return ResponseEntity.ok(customPageResponse);
     }
 
+
     // DELETE /usage/{usageId}: Delete a usage with verification of user_id
     @DeleteMapping("/{usageId}")
     public ResponseEntity<String> deleteUsage(@PathVariable UUID usageId) {

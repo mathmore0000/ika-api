@@ -1,10 +1,14 @@
 package ika.entities;
 
+import com.amazonaws.HttpMethod;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 // File Entity

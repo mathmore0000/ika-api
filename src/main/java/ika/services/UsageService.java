@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -101,7 +102,7 @@ public class UsageService {
         Usage usage = usageOptional.get();
         UUID responsibleId = currentUserProvider.getCurrentUserId();
 
-        if (!userResponsibleRepository.existsByResponsibleIdAndUserIdAndAccepted(usage.getUserId(), responsibleId)) {
+        if (!userResponsibleRepository.existsByUserIdAndResponsibleIdAndAccepted(usage.getUserId(), responsibleId)) {
             throw new ResourceNotFoundException("You are not responsible by this usage.");
         }
 
@@ -239,11 +240,13 @@ public class UsageService {
     }
 
     private UsageResponse convertToUsageResponse(Usage usage) {
-        return new UsageResponse(usage);
+        URL url = fileService.generatePresignedUrl(usage.getVideo().getBucket().getName(), usage.getVideo().getName());
+        return new UsageResponse(usage, url);
     }
 
     private UsageWithUserResponse convertToUsageWithUserResponse(Usage usage) {
         Optional<User> user = userRepository.findById(usage.getUserId());
-        return new UsageWithUserResponse(usage, user.get());
+        URL url = fileService.generatePresignedUrl(usage.getVideo().getBucket().getName(), usage.getVideo().getName());
+        return new UsageWithUserResponse(usage, user.get(), url);
     }
 }

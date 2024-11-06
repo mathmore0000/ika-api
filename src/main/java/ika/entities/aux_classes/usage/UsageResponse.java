@@ -7,6 +7,7 @@ import ika.entities.UserMedicationStockUsage;
 import ika.entities.aux_classes.medication.MedicationResponse;
 import lombok.Data;
 
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -18,11 +19,13 @@ public class UsageResponse {
     private UUID id;
     private List<UserMedicationStockWithUsageResponse> userMedicationStockResponses;
     private Boolean isApproved;
+    private URL url;
     private FileEntity video;
     private OffsetDateTime actionTmstamp;
 
-    public UsageResponse(Usage usage) {
+    public UsageResponse(Usage usage, URL url) {
         this.id = usage.getId();
+        this.url = url;
         this.isApproved = usage.getIsApproved();
         this.actionTmstamp = usage.getActionTmstamp();
         this.video = usage.getVideo();

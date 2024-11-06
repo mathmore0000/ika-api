@@ -1,17 +1,17 @@
 package ika.services;
 
+import com.amazonaws.HttpMethod;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import ika.entities.FileEntity;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import ika.entities.Bucket;
 import ika.entities.Usage;
@@ -44,6 +44,18 @@ public class FileService {
 
     @Autowired
     private CurrentUserProvider currentUserProvider;
+
+    public URL generatePresignedUrl(String bucketName, String objectKey) {
+        Date expiration = new Date();
+        expiration.setTime(expiration.getTime() + 60 * 60 * 1000);
+
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                new GeneratePresignedUrlRequest(bucketName, objectKey)
+                        .withMethod(HttpMethod.GET)
+                        .withExpiration(expiration);
+
+        return s3Client.generatePresignedUrl(generatePresignedUrlRequest);
+    }
 
     public FileEntity uploadFile(String bucketDescription, MultipartFile file) throws Exception {
         OffsetDateTime localDateTimeNow = OffsetDateTime.now();
