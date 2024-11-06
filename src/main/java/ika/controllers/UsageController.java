@@ -5,6 +5,7 @@ import ika.entities.aux_classes.CustomPageResponse;
 import ika.entities.aux_classes.usage.ApproveRejectUsageRequest;
 import ika.entities.aux_classes.usage.UsageRequest;
 import ika.entities.aux_classes.usage.UsageResponse;
+import ika.entities.aux_classes.usage.UsageWithUserResponse;
 import ika.services.UsageService;
 import ika.utils.CurrentUserProvider;
 import jakarta.validation.ConstraintViolation;
@@ -45,6 +46,7 @@ public class UsageController {
     public ResponseEntity<Map<String, String>> createUsage(
             @Valid @RequestParam("file") @NotNull(message = "File is required") MultipartFile file,
             @RequestPart UsageRequest usageRequest) throws Exception {
+        System.out.println("entrei");
         Set<ConstraintViolation<UsageRequest>> violations = validator.validate(usageRequest);
         if (!violations.isEmpty()) {
             Map<String, String> errors = new HashMap<>();
@@ -96,7 +98,7 @@ public class UsageController {
     }
 
     @GetMapping("/responsible")
-    public ResponseEntity<CustomPageResponse<UsageResponse>> getFilteredUsagesByResponsible(
+    public ResponseEntity<CustomPageResponse<UsageWithUserResponse>> getFilteredUsagesByResponsible(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(value = "isApproved", required = false) Boolean isApproved,
@@ -114,10 +116,10 @@ public class UsageController {
         Pageable pageable = CustomPageResponse.createPageableWithSort(page, size, sortBy, sortDirection);
 
         // Chama o serviço passando os filtros e a paginação
-        Page<UsageResponse> usagePage = usageService.getFilteredUsagesByResponsible(responsibleId, isApproved, fromDate, toDate, pageable);
+        Page<UsageWithUserResponse> usagePage = usageService.getFilteredUsagesByResponsible(responsibleId, isApproved, fromDate, toDate, pageable);
 
         // Cria a resposta customizada para retornar
-        CustomPageResponse<UsageResponse> customPageResponse = new CustomPageResponse<>(
+        CustomPageResponse<UsageWithUserResponse> customPageResponse = new CustomPageResponse<>(
                 usagePage.getContent(),
                 usagePage.getNumber(),
                 usagePage.getSize(),

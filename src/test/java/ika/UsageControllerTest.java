@@ -258,7 +258,6 @@ class UsageControllerTest {
                 .andExpect(jsonPath("$.totalPages").value(2));  // Espera 2 páginas de resultados
     }
 
-
     @Test
     void testCreateUsageSuccess() throws Exception {
         UsageRequest request = new UsageRequest();

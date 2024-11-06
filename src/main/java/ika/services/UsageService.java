@@ -5,10 +5,8 @@ import ika.entities.aux_classes.medication.MedicationResponse;
 import ika.entities.aux_classes.usage.ApproveRejectUsageRequest;
 import ika.entities.aux_classes.usage.UsageRequest;
 import ika.entities.aux_classes.usage.UsageResponse;
-import ika.repositories.LabelRepository;
-import ika.repositories.UsageLabelsRepository;
-import ika.repositories.UsageRepository;
-import ika.repositories.UserResponsibleRepository;
+import ika.entities.aux_classes.usage.UsageWithUserResponse;
+import ika.repositories.*;
 import ika.utils.CurrentUserProvider;
 import ika.utils.exceptions.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
@@ -41,6 +39,9 @@ public class UsageService {
 
     @Autowired
     private LabelRepository labelRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private FileService fileService;
@@ -100,7 +101,7 @@ public class UsageService {
         Usage usage = usageOptional.get();
         UUID responsibleId = currentUserProvider.getCurrentUserId();
 
-        if (!userResponsibleRepository.existsByResponsibleIdAndUserIdAndAccepted(usage.getUserId(), responsibleId)){
+        if (!userResponsibleRepository.existsByResponsibleIdAndUserIdAndAccepted(usage.getUserId(), responsibleId)) {
             throw new ResourceNotFoundException("You are not responsible by this usage.");
         }
 
@@ -207,9 +208,9 @@ public class UsageService {
         return usageRepository.findAllWithFiltersByUserId(userId, isApproved, fromDate, toDate, pageable).map(this::convertToUsageResponse);
     }
 
-    public Page<UsageResponse> getFilteredUsagesByResponsible(UUID responsibled, Boolean isApproved, OffsetDateTime fromDate, OffsetDateTime toDate, Pageable pageable) {
+    public Page<UsageWithUserResponse> getFilteredUsagesByResponsible(UUID responsibled, Boolean isApproved, OffsetDateTime fromDate, OffsetDateTime toDate, Pageable pageable) {
         // O repositório fará a filtragem com base nos parâmetros e na paginação
-        return usageRepository.findAllWithFiltersByResponsibleId(responsibled, isApproved, fromDate, toDate, pageable).map(this::convertToUsageResponse);
+        return usageRepository.findAllWithFiltersByResponsibleId(responsibled, isApproved, fromDate, toDate, pageable).map(this::convertToUsageWithUserResponse);
     }
 
     @Transactional
@@ -236,8 +237,13 @@ public class UsageService {
             fileService.deleteFile(usage.getVideo().getId());  // Deletar o registro na base
         }
     }
+
     private UsageResponse convertToUsageResponse(Usage usage) {
         return new UsageResponse(usage);
     }
 
+    private UsageWithUserResponse convertToUsageWithUserResponse(Usage usage) {
+        Optional<User> user = userRepository.findById(usage.getUserId());
+        return new UsageWithUserResponse(usage, user.get());
+    }
 }
