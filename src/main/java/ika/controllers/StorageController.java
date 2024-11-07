@@ -1,5 +1,6 @@
 package ika.controllers;
 
+import ika.entities.User;
 import ika.entities.aux_classes.CustomPageResponse;
 import ika.entities.Bucket;
 import ika.services.BucketService;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -31,10 +31,11 @@ public class StorageController {
     @PostMapping("/buckets/{bucketDescription}/files")
     public ResponseEntity<String> uploadFile(@PathVariable String bucketDescription,
                                              @RequestParam("file") MultipartFile file) throws Exception {
+        User user = currentUserProvider.getCurrentUser();
         // Use MultipartFile's InputStream instead of creating a temp file
 
         // Call the uploadFile method from the service with correct parameters
-        fileService.uploadFile(bucketDescription, file);
+        fileService.uploadVideo(user.getId(), bucketDescription, file);
 
         return ResponseEntity.ok("File uploaded successfully");
     }

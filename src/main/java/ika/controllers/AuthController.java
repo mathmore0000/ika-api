@@ -50,7 +50,7 @@ public class AuthController {
         UserDetails userDetails = userService.loadUserByUsername(username);
 
         final Optional<User> user = userService.loadUserByEmail(username);
-        String newJwt = jwtUtil.generateToken(userDetails, user.get().getId());
+        String newJwt = jwtUtil.generateToken(userDetails, user.get());
         String newRefreshToken = jwtUtil.generateRefreshToken(userDetails);
 
         TokenResponse tokenResponse = new TokenResponse(newJwt, newRefreshToken);
@@ -71,7 +71,7 @@ public class AuthController {
 
         final Optional<User> user = userService.loadUserByEmail(authRequest.getUsername());
         UserDetails userDetails = userService.loadUserByUsername(authRequest.getUsername());
-        final String jwt = jwtUtil.generateToken(userDetails, user.get().getId());
+        final String jwt = jwtUtil.generateToken(userDetails, user.get());
         final String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
         TokenResponse tokenResponse = new TokenResponse(jwt, refreshToken);

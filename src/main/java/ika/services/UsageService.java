@@ -1,7 +1,6 @@
 package ika.services;
 
 import ika.entities.*;
-import ika.entities.aux_classes.medication.MedicationResponse;
 import ika.entities.aux_classes.usage.ApproveRejectUsageRequest;
 import ika.entities.aux_classes.usage.UsageRequest;
 import ika.entities.aux_classes.usage.UsageResponse;
@@ -14,11 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -68,7 +65,7 @@ public class UsageService {
         System.out.println("Mecicamentos validados");
 
         // Upload do vídeo
-        FileEntity video = fileService.uploadFile("videos", file);
+        FileEntity video = fileService.uploadVideo(userId,"videos", file);
         System.out.println("Vídeo upado no S3 e salvo na base");
         System.out.println(video);
 

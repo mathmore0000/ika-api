@@ -84,7 +84,7 @@ class LabelControllerTest {
         createUser("Default User", email, "password", "pt");
         final Optional<User> user = userService.loadUserByEmail(email);
         final UserDetails userDetails = userService.loadUserByUsername(email);
-        return jwtUtil.generateToken(userDetails, user.get().getId());
+        return jwtUtil.generateToken(userDetails, user.get());
     }
 
     void createUser(String displayName, String email, String password, String locale) throws Exception {

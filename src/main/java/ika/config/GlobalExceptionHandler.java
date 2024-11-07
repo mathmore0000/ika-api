@@ -3,6 +3,7 @@ package ika.config;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import ika.utils.exceptions.ResourceNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MissingPathVariableException;
@@ -111,6 +112,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MultipartException.class)
     public ResponseEntity<String> handleMultipartException(MultipartException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File is required or invalid multipart request.");
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<String> handleMultipartException(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

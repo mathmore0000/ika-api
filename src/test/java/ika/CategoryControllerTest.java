@@ -91,7 +91,7 @@ class CategoryControllerTest {
         createUser("Default User", email, "password", "pt");
         final Optional<User> user = userService.loadUserByEmail(email);
         final UserDetails userDetails = userService.loadUserByUsername(email);
-        return jwtUtil.generateToken(userDetails, user.get().getId());
+        return jwtUtil.generateToken(userDetails, user.get());
     }
 
     // Method to create a new user for testing purposes

@@ -6,6 +6,7 @@ import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -47,7 +48,7 @@ public class User {
     private boolean disabled = false;
 
     @Column(name = "birth_date")
-    private OffsetDateTime birthDate;
+    private Date birthDate;
 
     @Column(name = "last_seen")
     private OffsetDateTime lastSeen;

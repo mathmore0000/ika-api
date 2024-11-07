@@ -1,5 +1,6 @@
 package ika.utils;
 
+import ika.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -53,9 +54,14 @@ public class JwtUtil {
     }
 
     // Gera o token JWT usando as informações do UserDetails
-    public String generateToken(UserDetails userDetails, UUID userId) {
+    public String generateToken(UserDetails userDetails, User user) {
         Map<String, Object> claims = new HashMap<>(); // Você pode adicionar claims extras aqui
-        claims.put("userId", userId); // Adiciona as roles do usuário
+        claims.put("userId", user.getId()); // Adiciona as roles do usuário
+        claims.put("locale", user.getLocale()); // Adiciona as roles do usuário
+        claims.put("displayName", user.getDisplayName());
+        claims.put("phoneNumber", user.getPhoneNumber());
+        claims.put("dateOfBirth", user.getBirthDate());
+        claims.put("avatarUrl", user.getAvatarUrl());
         claims.put("roles", userDetails.getAuthorities()); // Adiciona as roles do usuário
         return createToken(claims, userDetails.getUsername());
     }

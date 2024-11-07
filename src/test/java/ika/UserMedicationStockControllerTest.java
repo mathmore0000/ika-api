@@ -115,7 +115,7 @@ class UserMedicationStockControllerTest {
     private String getJwtFromUser(String email) throws Exception {
         final Optional<User> user = userService.loadUserByEmail(email);
         final UserDetails userDetails = userService.loadUserByUsername(email);
-        return jwtUtil.generateToken(userDetails, user.get().getId());
+        return jwtUtil.generateToken(userDetails, user.get());
     }
 
     // Cria um novo usuário para testes

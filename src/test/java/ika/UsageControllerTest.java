@@ -156,7 +156,7 @@ class UsageControllerTest {
         final Optional<User> user = userService.loadUserByEmail(email);
         final UserDetails userDetails = userService.loadUserByUsername(email);
         userId = user.get().getId();
-        return jwtUtil.generateToken(userDetails, userId);
+        return jwtUtil.generateToken(userDetails, user.get());
     }
 
     // Method to create a new user for testing purposes
