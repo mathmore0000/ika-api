@@ -42,6 +42,9 @@ public class UsageService {
     private UserRepository userRepository;
 
     @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
     private FileService fileService;
 
     @Autowired
@@ -65,7 +68,7 @@ public class UsageService {
         System.out.println("Mecicamentos validados");
 
         // Upload do vídeo
-        FileEntity video = fileService.uploadVideo(user.getId(),"videos", file);
+        FileEntity video = fileService.uploadVideo(user.getId(), "videos", file);
         System.out.println("Vídeo upado no S3 e salvo na base");
         System.out.println(video);
 
@@ -83,11 +86,22 @@ public class UsageService {
         // Passar os estoques de medicação já validados para o serviço
         userMedicationStockLogUsageService.createMedicationLog(usage.getId(), usageRequest.getMedications(), userMedicationStocks);
 
+        createNotificationOnNewUsage(user);
         return Map.of(
                 "message", "Usage created successfully",
                 "usageId", usage.getId().toString(),
                 "videoId", video.getId().toString()
         );
+    }
+
+    private void createNotificationOnNewUsage(User user) {
+        List<UserResponsible> userResponsibles = userResponsibleRepository.findByUserIdAndAccepted(user.getId(), true);
+        if (userResponsibles.isEmpty()) {
+            return;
+        }
+        for (UserResponsible userResponsible : userResponsibles) {
+            notificationService.createNotification(userResponsible.getResponsible(), "Novo vídeo", "{\"message\": \"Novo vídeo do usuário " + user.getDisplayName() + " necessitando validação.\"}");
+        }
     }
 
     public void updateUsage(UUID usageId, ApproveRejectUsageRequest request, boolean isApproved) throws Exception {
@@ -124,6 +138,8 @@ public class UsageService {
         usageLabelsRepository.deleteAllById(usageLabelIds);
         usageLabelsRepository.saveAll(newUsageLabels);  // Salvar as novas associações
         usageRepository.save(usage);  // Salvar a entidade Usage atualizada
+
+        notificationService.createNotification(usage.getUser(), "Vídeo " + (isApproved ? "aprovado" : "reprovado"), "{\"message\": \"O usuário " + usage.getResponsible().getDisplayName() + " " + (isApproved ? "aprovou" : "reprovou") + " seu vídeo.\"}");
     }
 
     private void validateUserMedicationUsages(List<UserMedicationStock> userMedicationStocks, UsageRequest usageRequest) {

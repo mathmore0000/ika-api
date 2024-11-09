@@ -19,13 +19,16 @@ public interface UserResponsibleRepository extends JpaRepository<UserResponsible
     @Query("SELECT COUNT(ur) > 0 FROM UserResponsible ur WHERE ur.userId = :userId AND ur.responsibleId = :responsibleId AND ur.accepted = true")
     boolean existsByUserIdAndResponsibleIdAndAccepted(@Param("userId") UUID userId, @Param("responsibleId") UUID responsibleId);
 
-    @Query("SELECT ur FROM UserResponsible ur WHERE ur.userId = :userId AND ur.responsibleId = :responsibleId AND ur.accepted = false")
-    Optional<UserResponsible> findByUserIdAndResponsibleIdAndAcceptedFalse(UUID userId, UUID responsibleId);
+    @Query("SELECT ur FROM UserResponsible ur WHERE ur.userId = :userId AND ur.responsibleId = :responsibleId AND ur.accepted = false or ur.accepted is null")
+    Optional<UserResponsible> findByUserIdAndResponsibleIdAndAcceptedFalseOrNull(UUID userId, UUID responsibleId);
 
     Optional<UserResponsible> findByUserIdAndResponsibleId(UUID userId, UUID responsibleId);
 
     @Query("SELECT ur FROM UserResponsible ur WHERE ur.userId = :userId AND (:accepted IS NULL OR ur.accepted = :accepted)")
     Page<UserResponsible> findByUserIdAndAccepted(UUID userId, @Param("accepted") Boolean accepted, Pageable pageable);
+
+    @Query("SELECT ur FROM UserResponsible ur WHERE ur.userId = :userId AND (:accepted IS NULL OR ur.accepted = :accepted)")
+    List<UserResponsible> findByUserIdAndAccepted(UUID userId, @Param("accepted") Boolean accepted);
 
     @Query("SELECT ur FROM UserResponsible ur WHERE ur.responsibleId = :responsibleId AND (:accepted IS NULL OR ur.accepted = :accepted)")
     Page<UserResponsible> findByResponsibleIdAndAccepted(UUID responsibleId, @Param("accepted") Boolean accepted, Pageable pageable);

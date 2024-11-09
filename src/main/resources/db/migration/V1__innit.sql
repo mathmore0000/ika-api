@@ -30,7 +30,7 @@ CREATE TABLE public.user_responsibles
 (
     id_user UUID NOT NULL,
     id_responsible UUID NOT NULL,
-    accepted BOOLEAN NOT NULL DEFAULT FALSE,
+    accepted BOOLEAN DEFAULT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -125,6 +125,17 @@ CREATE TABLE public.usage_labels
     id_label UUID
 );
 
+CREATE TABLE public.notifications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id_user UUID NOT NULL,
+    seen BOOLEAN DEFAULT FALSE,
+    seen_at TIMESTAMPTZ,
+    message TEXT NOT NULL,
+    detailed_message JSONB,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+
 CREATE TABLE storage.files
 (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -190,6 +201,13 @@ ALTER TABLE public.user_medication_stock
 ADD CONSTRAINT fk_user_medication_stock 
 FOREIGN KEY (id_user_medication) 
 REFERENCES public.user_medication (id);
+
+-- Add foreign key constraint to public.notifications
+ALTER TABLE public.notifications
+ADD CONSTRAINT fk_notifications_user
+FOREIGN KEY (id_user) REFERENCES auth.users (id);
+
+CREATE INDEX idx_notifications_user_seen ON notifications (id_user, seen);
 
 -- Add foreign key constraints to public.usage
 ALTER TABLE public.usage

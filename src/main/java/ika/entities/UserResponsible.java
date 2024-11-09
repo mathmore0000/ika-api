@@ -34,8 +34,8 @@ public class UserResponsible {
     @MapsId("responsibleId") // Mapeia `responsibleId` como parte da chave composta
     private User responsible;
 
-    @Column(name = "accepted", nullable = false)
-    private Boolean accepted = false;
+    @Column(name = "accepted")
+    private Boolean accepted = null;
 
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now();
