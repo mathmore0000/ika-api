@@ -121,4 +121,12 @@ public class UserController {
         String publicUrl = userService.changeImage(user, image);
         return ResponseEntity.ok(publicUrl);
     }
+
+    // Endpoint para trocar token de notificação
+    @PatchMapping("/change-notification-token")
+    public ResponseEntity<String> changeNotificationToken(@RequestBody @Valid NotificationTokenChangeRequest notificationTokenChangeRequest) {
+        User user = currentUserProvider.getCurrentUser();
+        userService.changeNotificationToken(user, notificationTokenChangeRequest.getNotificationToken());
+        return ResponseEntity.ok("Notification token updated");
+    }
 }

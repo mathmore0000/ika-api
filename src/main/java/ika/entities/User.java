@@ -31,6 +31,9 @@ public class User {
     @Column(name = "locale", nullable = false)
     private String locale;
 
+    @Column(name = "notification_token")
+    private String notificationToken;
+
     @Column(name = "phone_number", unique = true)
     private String phoneNumber;
 

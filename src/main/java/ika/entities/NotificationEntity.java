@@ -11,7 +11,7 @@ import java.util.UUID;
 @Entity
 @Data
 @Table(name = "notifications")
-public class Notification {
+public class NotificationEntity {
 
     @Id
     @GeneratedValue

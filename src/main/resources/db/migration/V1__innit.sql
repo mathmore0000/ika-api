@@ -7,7 +7,8 @@ CREATE TABLE auth.users
 ( 
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),  
     display_name VARCHAR(30) NOT NULL,  
-    email VARCHAR(50) NOT NULL,  
+    email VARCHAR(50) NOT NULL,
+    notification_token VARCHAR(50),
     locale VARCHAR(2) NOT NULL DEFAULT 'pt',  
     phone_number VARCHAR(15),  
     password_hash VARCHAR(60) NOT NULL,  

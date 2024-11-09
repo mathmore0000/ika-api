@@ -38,6 +38,11 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
+    public void changeNotificationToken(User user, String notificationToken){
+        user.setNotificationToken(notificationToken);
+        updateUser(user);
+    }
+
     public String changeImage(User user, MultipartFile image) throws Exception {
         // Upload new image
         FileEntity newFile = fileService.uploadImage(user.getId(), "avatar-images", image);

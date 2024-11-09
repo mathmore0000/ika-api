@@ -1,6 +1,5 @@
 package ika.controllers;
 
-import ika.entities.Notification;
 import ika.entities.User;
 import ika.entities.aux_classes.notifications.NotificationResponse;
 import ika.services.NotificationService;
