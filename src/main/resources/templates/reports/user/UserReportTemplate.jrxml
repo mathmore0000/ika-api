@@ -1,0 +1,102 @@
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="UserReport" pageWidth="595" pageHeight="842" columnWidth="515"
+              leftMargin="40" rightMargin="40" topMargin="40" bottomMargin="40"
+              uuid="c1e4b8a7-6a9d-4c1a-9d7e-8e2d1d2f9abc">
+
+    <!-- Declaração dos Parâmetros -->
+    <parameter name="userImage" class="java.io.InputStream"/>
+    <parameter name="displayName" class="java.lang.String"/>
+    <parameter name="email" class="java.lang.String"/>
+    <parameter name="birthDate" class="java.lang.String"/>
+    <parameter name="todayDatetime" class="java.lang.String"/>
+    <parameter name="userMedicationStockSubReport" class="net.sf.jasperreports.engine.JasperReport"/>
+    <parameter name="medicationUsageDataSubReport" class="net.sf.jasperreports.engine.JasperReport"/>
+    <parameter name="medicationUsageDataSource" class="net.sf.jasperreports.engine.JRDataSource"/>
+    <parameter name="subReportUsageApprovalRejectSubReport" class="net.sf.jasperreports.engine.JasperReport"/>
+    <parameter name="userMedicationStockDateSource" class="net.sf.jasperreports.engine.JRDataSource"/>
+    <parameter name="usageApprovalsRejectionsDataSource" class="net.sf.jasperreports.engine.JRDataSource"/>
+
+    <!-- Título do relatório -->
+    <pageHeader>
+        <band height="50" isSplitAllowed="true">
+            <!-- Título do Relatório -->
+            <staticText>
+                <reportElement x="0" y="0" width="515" height="30"/>
+                <textElement textAlignment="Center">
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Relatório de Usuário]]></text>
+            </staticText>
+
+            <!-- Data e Hora Atual -->
+            <textField isStretchWithOverflow="true">
+                <reportElement x="400" y="10" width="100" height="20"/>
+                <textFieldExpression><![CDATA["Data do Relatório: " + $P{todayDatetime}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageHeader>
+
+
+    <!-- Informações do usuário e sub-relatório de estoques no mesmo detail -->
+    <detail>
+        <band height="100" isSplitAllowed="true">
+            <!-- Imagem do Usuário -->
+            <image>
+                <reportElement x="0" y="0" width="100" height="100"/>
+                <imageExpression><![CDATA[$P{userImage}]]></imageExpression>
+            </image>
+            <!-- Informações do Usuário -->
+            <textField isStretchWithOverflow="true">
+                <reportElement x="150" y="0" width="200" height="20"/>
+                <textFieldExpression><![CDATA["Nome: " + $P{displayName}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true">
+                <reportElement x="150" y="20" width="200" height="20"/>
+                <textFieldExpression><![CDATA["Email: " + $P{email}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true">
+                <reportElement x="150" y="40" width="200" height="20"/>
+                <textFieldExpression><![CDATA["Data de Nascimento: " +
+                ($P{birthDate} != null ? $P{birthDate}.toString() : "N/A")]]></textFieldExpression>
+            </textField>
+        </band>
+
+        <band height="20">
+            <frame>
+                <reportElement x="0" y="0" width="515" height="20"/>
+                <subreport>
+                    <reportElement x="0" y="0" width="515" height="20"/>
+                    <dataSourceExpression><![CDATA[$P{medicationUsageDataSource}]]></dataSourceExpression>
+                    <subreportExpression><![CDATA[$P{medicationUsageDataSubReport}]]></subreportExpression>
+                </subreport>
+            </frame>
+        </band>
+
+        <band height="20">
+            <!-- Frame para o Sub-relatório Estoques de Medicamentos -->
+            <frame>
+                <reportElement x="0" y="0" width="515" height="20"/>
+                <subreport>
+                    <reportElement x="0" y="0" width="515" height="20"/>
+                    <dataSourceExpression><![CDATA[$P{userMedicationStockDateSource}]]></dataSourceExpression>
+                    <subreportExpression><![CDATA[$P{userMedicationStockSubReport}]]></subreportExpression>
+                </subreport>
+            </frame>
+
+        </band>
+        <band height="20">
+            <!-- Frame para o Sub-relatório Aprovações/Reprovações -->
+            <frame>
+                <reportElement x="0" y="0" width="515" height="20"/>
+                <subreport>
+                    <reportElement x="0" y="0" width="515" height="20"/>
+                    <dataSourceExpression><![CDATA[$P{usageApprovalsRejectionsDataSource}]]></dataSourceExpression>
+                    <subreportExpression><![CDATA[$P{subReportUsageApprovalRejectSubReport}]]></subreportExpression>
+                </subreport>
+            </frame>
+        </band>
+    </detail>
+</jasperReport>

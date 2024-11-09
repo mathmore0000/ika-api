@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,6 +42,7 @@ public class UserMedicationService {
         UserMedication userMedication = new UserMedication(userMedicationDetails);
         userMedication.setUser(user);
         userMedication.setMedication(medication);
+        userMedication.setCreatedAt(OffsetDateTime.now());
         // Set defaults if values are not provided by the user
         if (userMedicationDetails.getMaxTakingTime() <= 0) {
             userMedication.setMaxTakingTime(medication.getMaxTakingTime());

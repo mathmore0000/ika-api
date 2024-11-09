@@ -25,6 +25,13 @@
         </dependency>
 
         <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>6.20.0</version> <!-- Verifique a última versão disponível no Maven Central -->
+        </dependency>
+
+
+        <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
             <version>1.12.773</version>

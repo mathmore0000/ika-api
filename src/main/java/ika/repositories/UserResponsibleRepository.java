@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,4 +29,6 @@ public interface UserResponsibleRepository extends JpaRepository<UserResponsible
 
     @Query("SELECT ur FROM UserResponsible ur WHERE ur.responsibleId = :responsibleId AND (:accepted IS NULL OR ur.accepted = :accepted)")
     Page<UserResponsible> findByResponsibleIdAndAccepted(UUID responsibleId, @Param("accepted") Boolean accepted, Pageable pageable);
+
+    List<UserResponsible> findByResponsibleId(UUID responsibleId);
 }

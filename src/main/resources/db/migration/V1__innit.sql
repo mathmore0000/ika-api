@@ -104,8 +104,10 @@ CREATE TABLE public.usage
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     id_user UUID NOT NULL,
     id_file UUID NOT NULL,
+    id_responsible UUID DEFAULT NULL,
     is_approved BOOLEAN DEFAULT NULL,
     obs VARCHAR(100) DEFAULT NULL,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     action_tmstamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -196,6 +198,11 @@ FOREIGN KEY (id_user)
 REFERENCES auth.users (id);
 
 ALTER TABLE public.usage
+ADD CONSTRAINT fk_responsible_usage
+FOREIGN KEY (id_responsible)
+REFERENCES auth.users (id);
+
+ALTER TABLE public.usage
 ADD CONSTRAINT fk_file_usage
 FOREIGN KEY (id_file)
 REFERENCES storage.files (id);
@@ -226,3 +233,16 @@ ALTER TABLE public.user_medication_stock_usage
 ADD CONSTRAINT fk_user_medication_stock
 FOREIGN KEY (id_user_medication_stock)
 REFERENCES public.user_medication_stock (id);
+
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_updated_at
+BEFORE UPDATE ON public.usage
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();

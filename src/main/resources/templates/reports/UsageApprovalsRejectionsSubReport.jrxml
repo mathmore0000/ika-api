@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="UsageApprovalsRejectionsSubReport" pageWidth="595" pageHeight="842" columnWidth="515"
+              leftMargin="40" rightMargin="40" topMargin="40" bottomMargin="40"
+              uuid="f693c10f-e92a-45f3-914f-f7260818729f">
+
+    <!-- Campos do sub-relatório -->
+    <field name="medicationName" class="java.lang.String"/>
+    <field name="userName" class="java.lang.String"/>
+    <field name="ingestionTime" class="java.lang.String"/>
+    <field name="approvalTime" class="java.lang.String"/>
+    <field name="status" class="java.lang.String"/>
+
+    <!-- Título da Tabela -->
+    <title>
+        <band height="30">
+            <staticText>
+                <reportElement x="0" y="0" width="515" height="30"/>
+                <textElement textAlignment="Center">
+                    <font size="14" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Aprovações/Reprovações]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <!-- Cabeçalho da Tabela -->
+    <columnHeader>
+        <band height="20">
+            <staticText>
+                <reportElement x="0" y="0" width="100" height="20" forecolor="#000000" backcolor="#D3D3D3" mode="Opaque"/>
+                <box>
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Medicamento]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="100" y="0" width="80" height="20" forecolor="#000000" backcolor="#D3D3D3" mode="Opaque"/>
+                <box>
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Usuário]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="180" y="0" width="100" height="20" forecolor="#000000" backcolor="#D3D3D3" mode="Opaque"/>
+                <box>
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Horário Ingestão]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="280" y="0" width="100" height="20" forecolor="#000000" backcolor="#D3D3D3" mode="Opaque"/>
+                <box>
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Horário Aprovação]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="380" y="0" width="100" height="20" forecolor="#000000" backcolor="#D3D3D3" mode="Opaque"/>
+                <box>
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Status]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <!-- Detalhes da Tabela -->
+    <detail>
+        <band height="20" isSplitAllowed="true">
+            <textField>
+                <reportElement x="0" y="0" width="100" height="20"/>
+                <box>
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA[$F{medicationName}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="100" y="0" width="80" height="20"/>
+                <box>
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA[$F{userName}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="180" y="0" width="100" height="20"/>
+                <box>
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA[$F{ingestionTime}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="280" y="0" width="100" height="20"/>
+                <box>
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA[$F{approvalTime}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="380" y="0" width="100" height="20"/>
+                <box>
+                    <pen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center"/>
+                <textFieldExpression><![CDATA[$F{status}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+</jasperReport>

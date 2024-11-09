@@ -17,18 +17,26 @@ public class Usage {
     @Id
     @Column(name = "id", nullable = false, unique = true)
     private UUID id;
-    @Column(name = "id_user", nullable = false)
-    private UUID userId;
     @Column(name = "action_tmstamp", nullable = false)
     private OffsetDateTime actionTmstamp;
+    @Column(name = "updated_at", nullable = true)
+    private OffsetDateTime updatedAt;
     @Column(name = "is_approved")
     private Boolean isApproved;
     @Column(name = "obs")
     private String Obs;
 
     @OneToOne
+    @JoinColumn(name = "id_user", nullable = false)
+    private User user;
+
+    @OneToOne
     @JoinColumn(name = "id_file")
     private FileEntity video;
+
+    @OneToOne
+    @JoinColumn(name = "id_responsible", nullable = true)
+    private User responsible;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(

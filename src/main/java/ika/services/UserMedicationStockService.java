@@ -80,11 +80,11 @@ public class UserMedicationStockService {
     }
 
     private Number calculateAvailableQuantity(UserMedicationStock stock) {
-        if (stock.getUserMedication().getQuantityMl() > 0) {
+        if (stock.getUserMedication().getQuantityMl() != null && stock.getUserMedication().getQuantityMl() > 0) {
             float stockTotalMl = stock.getQuantityStocked() * stock.getUserMedication().getQuantityMl();
             float usedMl = usageRepository.sumQuantityMlByMedicationStockId(stock.getId()).orElse(0f);
             return stockTotalMl - usedMl;
-        } else if (stock.getUserMedication().getQuantityInt() > 0) {
+        } else if (stock.getUserMedication().getQuantityInt() != null && stock.getUserMedication().getQuantityInt() > 0) {
             int stockTotalInt = stock.getQuantityStocked() * stock.getUserMedication().getQuantityInt();
             int usedInt = usageRepository.sumQuantityIntByMedicationStockId(stock.getId()).orElse(0);
             return stockTotalInt - usedInt;

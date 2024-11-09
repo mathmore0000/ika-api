@@ -1,6 +1,7 @@
 package ika.controllers;
 
 import ika.entities.Usage;
+import ika.entities.User;
 import ika.entities.aux_classes.CustomPageResponse;
 import ika.entities.aux_classes.usage.ApproveRejectUsageRequest;
 import ika.entities.aux_classes.usage.UsageRequest;
@@ -58,8 +59,8 @@ public class UsageController {
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
 
-        UUID userId = currentUserProvider.getCurrentUserId();
-        Map<String, String> response = usageService.createUsage(userId, file, usageRequest);
+        User user = currentUserProvider.getCurrentUser();
+        Map<String, String> response = usageService.createUsage(user, file, usageRequest);
         return ResponseEntity.ok(response);
     }
 

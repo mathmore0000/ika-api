@@ -4,10 +4,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import ika.utils.exceptions.ResourceNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.MissingPathVariableException;
-import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +20,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.DateTimeException;
 import java.util.Optional;
 
 @ControllerAdvice
@@ -63,24 +57,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFoundExceptions(Exception ex) {
+    public ResponseEntity<String> handleResourceNotFoundExceptions(ResourceNotFoundException ex) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
-    }
-
-    /**
-     * Trata outras exceções gerais que você desejar capturar e tratar globalmente.
-     */
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleAllExceptions(Exception ex) {
-        // Loga a exceção completa para referência futura
-        ex.printStackTrace();
-
-        // Retorna uma resposta com um status 500 (Internal Server Error)
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("An unexpected error occurred");
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -117,6 +97,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> handleMultipartException(BadCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(DateTimeException.class)
+    public ResponseEntity<String> handleDateTimeException(DateTimeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -182,6 +167,20 @@ public class GlobalExceptionHandler {
             path.append(reference.getFieldName()).append(".");
         }
         return path.length() > 0 ? path.substring(0, path.length() - 1) : "unknown field";
+    }
+
+    /**
+     * Trata outras exceções gerais que você desejar capturar e tratar globalmente.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleAllExceptions(Exception ex) {
+        // Loga a exceção completa para referência futura
+        ex.printStackTrace();
+
+        // Retorna uma resposta com um status 500 (Internal Server Error)
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("An unexpected error occurred");
     }
 }
 

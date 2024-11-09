@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+    http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="SupervisedUserSubReport" pageWidth="555" pageHeight="330" columnWidth="555" leftMargin="0"
+              rightMargin="0" topMargin="10" bottomMargin="10" uuid="c2a9fed4-f26b-4e1f-8b8b-6a79d2e9e56a">
+
+    <!-- Parâmetros -->
+    <parameter name="medicationUsageSubReport" class="net.sf.jasperreports.engine.JasperReport"/>
+
+    <!-- Campos de Dados -->
+    <field name="medicationUsageDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+    <field name="supervisedUserName" class="java.lang.String"/>
+
+    <detail>
+        <band height="100">
+            <!-- Sub-relatório de Uso de Medicamentos -->
+            <subreport>
+                <reportElement x="0" y="0" width="555" height="100"/>
+                <subreportParameter name="supervisedUserName">
+                    <subreportParameterExpression><![CDATA[$F{supervisedUserName}]]></subreportParameterExpression>
+                </subreportParameter>
+                <dataSourceExpression><![CDATA[$F{medicationUsageDataSource}]]></dataSourceExpression>
+                <subreportExpression><![CDATA[$P{medicationUsageSubReport}]]></subreportExpression>
+            </subreport>
+
+        </band>
+    </detail>
+</jasperReport>

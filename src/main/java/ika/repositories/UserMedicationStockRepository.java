@@ -42,4 +42,10 @@ public interface UserMedicationStockRepository extends JpaRepository<UserMedicat
             @Param("currentDate") OffsetDateTime currentDate,
             Pageable pageable);
 
+
+    @Query("SELECT ums FROM UserMedicationStock ums " +
+            "JOIN ums.userMedication um " +
+            "WHERE um.user.id = :userId " +
+            "AND ums.stockedAt BETWEEN :start AND :end")
+    List<UserMedicationStock> findByUserIdAndStockedAtBetween(@Param("userId") UUID userId, @Param("start") OffsetDateTime start, @Param("end") OffsetDateTime end);
 }

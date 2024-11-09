@@ -11,9 +11,12 @@ services:
       POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
       POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     entrypoint: /bin/sh -c "sleep 10 && \
-      PGPASSWORD=${SPRING_DATASOURCE_PASSWORD} psql -h postgres -U ${SPRING_DATASOURCE_USERNAME} -d ${SPRING_DATASOURCE_DB} -c \"INSERT INTO storage.buckets (id, description) VALUES ('80177d00-de14-4fe3-99d3-b11c0a64298f', 'videos');\" \"INSERT INTO storage.buckets (id, description) VALUES ('b8131274-aef6-49fd-ac38-06c1a594c2c6', 'avatar-images');\""
+      PGPASSWORD=${SPRING_DATASOURCE_PASSWORD} psql -h postgres -U ${SPRING_DATASOURCE_USERNAME} -d ${SPRING_DATASOURCE_DB} -c \"INSERT INTO storage.buckets (id, description) VALUES \
+      ('80177d00-de14-4fe3-99d3-b11c0a64298f', 'videos'), \
+      ('b8131274-aef6-49fd-ac38-06c1a594c2c6', 'avatar-images');\""
     networks:
       - ika-network
+
 
   setup-localstack:
     image: amazon/aws-cli
@@ -25,10 +28,11 @@ services:
       AWS_SECRET_ACCESS_KEY: local
       AWS_DEFAULT_REGION: sa-east-1
     entrypoint: /bin/sh -c "sleep 10 && \
-      aws --endpoint-url=http://localstack:4566 s3 mb s3://videos-80177d00-de14-4fe3-99d3-b11c0a64298f \
+      aws --endpoint-url=http://localstack:4566 s3 mb s3://videos-80177d00-de14-4fe3-99d3-b11c0a64298f && \
       aws --endpoint-url=http://localstack:4566 s3 mb s3://avatar-images-b8131274-aef6-49fd-ac38-06c1a594c2c6"
     networks:
       - ika-network
+
 
   postgres:
     image: postgres

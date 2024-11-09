@@ -50,14 +50,14 @@ public class UsageService {
     @Autowired
     private UserMedicationStockService userMedicationStockService;
 
-    public Map<String, String> createUsage(UUID userId, MultipartFile file, UsageRequest usageRequest) throws Exception {
+    public Map<String, String> createUsage(User user, MultipartFile file, UsageRequest usageRequest) throws Exception {
         // Obter os IDs dos estoques de medicação do request
         List<UUID> medicationStockIds = usageRequest.getMedications().stream()
                 .map(UsageRequest.MedicationStockRequest::getMedicationStockId)
                 .toList();
 
         // Validar e obter os estoques de medicação do usuário
-        List<UserMedicationStock> userMedicationStocks = userMedicationStockService.getUserMedicationStocksByIdUserIdAndMedications(userId, medicationStockIds);
+        List<UserMedicationStock> userMedicationStocks = userMedicationStockService.getUserMedicationStocksByIdUserIdAndMedications(user.getId(), medicationStockIds);
         if (userMedicationStocks.size() != medicationStockIds.size()) {
             throw new ResourceNotFoundException("Some medications could not be found for the user");
         }
@@ -65,14 +65,14 @@ public class UsageService {
         System.out.println("Mecicamentos validados");
 
         // Upload do vídeo
-        FileEntity video = fileService.uploadVideo(userId,"videos", file);
+        FileEntity video = fileService.uploadVideo(user.getId(),"videos", file);
         System.out.println("Vídeo upado no S3 e salvo na base");
         System.out.println(video);
 
         // Criar e salvar o uso
         Usage usageToInsert = new Usage();
         usageToInsert.setId(UUID.randomUUID());
-        usageToInsert.setUserId(userId);
+        usageToInsert.setUser(user);
         usageToInsert.setVideo(video);
         usageToInsert.setIsApproved(null);  // Inicialmente não aprovado
         usageToInsert.setActionTmstamp(usageRequest.getActionTmstamp());
@@ -99,11 +99,12 @@ public class UsageService {
         Usage usage = usageOptional.get();
         UUID responsibleId = currentUserProvider.getCurrentUserId();
 
-        if (!userResponsibleRepository.existsByUserIdAndResponsibleIdAndAccepted(usage.getUserId(), responsibleId)) {
+        if (!userResponsibleRepository.existsByUserIdAndResponsibleIdAndAccepted(usage.getUser().getId(), responsibleId)) {
             throw new ResourceNotFoundException("You are not responsible by this usage.");
         }
 
         usage.setIsApproved(isApproved);
+        usage.setResponsible(currentUserProvider.getCurrentUser());
         usage.setObs(request.getObs());
 
         // Remover as associações antigas de UsageLabels
@@ -242,7 +243,7 @@ public class UsageService {
     }
 
     private UsageWithUserResponse convertToUsageWithUserResponse(Usage usage) {
-        Optional<User> user = userRepository.findById(usage.getUserId());
+        Optional<User> user = userRepository.findById(usage.getUser().getId());
         URL url = fileService.generatePresignedUrl(usage.getVideo().getBucket().getName(), usage.getVideo().getName());
         return new UsageWithUserResponse(usage, user.get(), url);
     }
