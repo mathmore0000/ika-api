@@ -28,20 +28,23 @@ public class CurrentUserProvider {
     }
 
     public User getCurrentUser() {
-        if (cachedUser == null) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-                String email = ((UserDetails) authentication.getPrincipal()).getUsername();
-                // Assumindo que você tem um método para buscar o usuário pelo e-mail
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
 
-                Optional<User> user = userService.loadUserByEmail(email);
-                if (user.isEmpty()){
-                    throw new UsernameNotFoundException("User not found with email: " + email);
-                }
-                cachedUser = user.get();
-            }
+            throw new UsernameNotFoundException("User not found");
         }
-        return cachedUser;
+        if (!(authentication.getPrincipal() instanceof UserDetails)) {
+
+            throw new UsernameNotFoundException("User not found");
+        }
+        String email = ((UserDetails) authentication.getPrincipal()).getUsername();
+        // Assumindo que você tem um método para buscar o usuário pelo e-mail
+
+        Optional<User> user = userService.loadUserByEmail(email);
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException("User not found with email: " + email);
+        }
+        return user.get();
     }
 
     public UUID getCurrentUserId() {
@@ -66,9 +69,5 @@ public class CurrentUserProvider {
             }
         }
         return null;
-    }
-
-    public void clearCache() {
-        cachedUser = null;
     }
 }

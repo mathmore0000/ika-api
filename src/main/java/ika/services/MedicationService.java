@@ -42,6 +42,7 @@ public class MedicationService {
     public void createMedication(MedicationRequest medicationRequest) {
         System.out.println("medication request " + medicationRequest);
         User user = currentUserProvider.getCurrentUser();
+        System.out.println("current user " + user);
         Medication medication = new Medication();
         medication.setName(medicationRequest.getName());
         medication.setCategory(categoryService.findById(medicationRequest.getCategoryId()));
