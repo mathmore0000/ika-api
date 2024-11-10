@@ -1,5 +1,6 @@
 package ika.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -18,6 +19,7 @@ public class UserMedicationStatus {
 
     @ManyToOne
     @JoinColumn(name = "id_user_medication", nullable = false)
+    @JsonBackReference
     private UserMedication userMedication;
 
     @Column(name = "active", nullable = false)

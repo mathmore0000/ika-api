@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -47,8 +48,12 @@ public class UserMedication {
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
+    @OneToMany(mappedBy = "userMedication", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<UserMedicationStatus> userMedicationStatuses;
+
     // Default constructor
-    public UserMedication() {}
+    public UserMedication() {
+    }
 
     // Constructor that sets defaults based on the medication values
     public UserMedication(User user, Medication medication, Integer quantityInt, Float quantityMl) {
@@ -60,7 +65,7 @@ public class UserMedication {
         this.quantityMl = quantityMl;
     }
 
-    public UserMedication(UserMedicationRequest userMedicationDetails){
+    public UserMedication(UserMedicationRequest userMedicationDetails) {
         this.maxTakingTime = userMedicationDetails.getMaxTakingTime();
         this.disabled = false;
         this.quantityInt = userMedicationDetails.getQuantityInt();
