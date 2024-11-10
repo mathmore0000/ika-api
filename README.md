@@ -59,7 +59,7 @@ docker-compose up --build
 Abaixo está a modelagem do banco de dados utilizada no projeto. Ela representa as tabelas e os relacionamentos principais, como `User`, `Medication`, `Usage`, entre outras.
 
 ### Diagrama ER (Entidade-Relacionamento)
-![MER](https://github.com/user-attachments/assets/a554caed-4d53-42df-9440-2d981d0f8645)
+![MER](https://github.com/user-attachments/assets/69c3b748-5a95-43e8-9233-248e8abe2044)
 
 Essa modelagem inclui as tabelas principais relacionadas ao gerenciamento de medicamentos e o uso pelos usuários.
 
