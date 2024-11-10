@@ -80,12 +80,4 @@ public class UserMedicationController {
         UserMedication updatedMedication = userMedicationService.updateUserMedication(userId, medicationId, updatedRequest);
         return ResponseEntity.ok(updatedMedication);
     }
-
-    @DeleteMapping("/{medicationId}")
-    public ResponseEntity<Void> deleteUserMedication(@PathVariable UUID medicationId) {
-        UUID userId = currentUserProvider.getCurrentUserId();
-        boolean isDeleted = userMedicationService.deleteUserMedication(userId, medicationId);
-        return isDeleted ? ResponseEntity.noContent().build()
-                : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
 }

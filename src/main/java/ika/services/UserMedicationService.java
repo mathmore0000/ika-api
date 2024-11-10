@@ -1,11 +1,13 @@
 package ika.services;
 
+import ika.entities.UserMedicationStatus;
 import ika.entities.aux_classes.user_medication.UserMedicationRequest;
 import ika.entities.Medication;
 import ika.entities.User;
 import ika.entities.UserMedication;
 import ika.repositories.MedicationRepository;
 import ika.repositories.UserMedicationRepository;
+import ika.repositories.UserMedicationStatusRepository;
 import ika.repositories.UserRepository;
 import ika.utils.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class UserMedicationService {
 
     @Autowired
     private UserMedicationRepository userMedicationRepository;
+
+    @Autowired
+    private UserMedicationStatusRepository userMedicationStatusRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -57,7 +62,14 @@ public class UserMedicationService {
             userMedication.setQuantityInt(medication.getQuantityInt());
         }
 
-        return Optional.of(userMedicationRepository.save(userMedication));
+        Optional<UserMedication> optionalUserMedication = Optional.of(userMedicationRepository.save(userMedication));
+
+        UserMedicationStatus userMedicationStatus = new UserMedicationStatus();
+        userMedicationStatus.setActive(true);
+        userMedicationStatus.setUserMedication(optionalUserMedication.get());
+        userMedicationStatusRepository.save(userMedicationStatus);
+
+        return optionalUserMedication;
     }
 
     public Page<UserMedication> getAllUserMedications(UUID userId, Pageable pageable) {
@@ -69,33 +81,32 @@ public class UserMedicationService {
         UserMedication userMedication = userMedicationRepository.findByUserIdAndMedicationId(userId, medicationId)
                 .orElseThrow(() -> new ResourceNotFoundException("User medication not found"));
         userMedication.setDisabled(disabled);
+
         userMedicationRepository.save(userMedication);
+
+        UserMedicationStatus userMedicationStatus = new UserMedicationStatus();
+        userMedicationStatus.setActive(!disabled);
+        userMedicationStatus.setUserMedication(userMedication);
+        userMedicationStatusRepository.save(userMedicationStatus);
+
         return userMedication;
     }
 
     // Method to update a user medication with new details
     public UserMedication updateUserMedication(UUID userId, UUID medicationId, UserMedicationRequest request) {
         UserMedication existingUserMedication = userMedicationRepository.findByUserIdAndMedicationId(userId, medicationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Medication relation not found"));;
-            UserMedication userMedication = existingUserMedication;
+                .orElseThrow(() -> new ResourceNotFoundException("Medication relation not found"));
+        ;
+        UserMedication userMedication = existingUserMedication;
 
-            // Update fields
-            userMedication.setQuantityInt(request.getQuantityInt());
-            userMedication.setQuantityMl(request.getQuantityMl());
-            userMedication.setTimeBetween(request.getTimeBetween());
-            userMedication.setFirstDosageTime(request.getFirstDosageTime());
-            userMedication.setMaxTakingTime(request.getMaxTakingTime());
+        // Update fields
+        userMedication.setQuantityInt(request.getQuantityInt());
+        userMedication.setQuantityMl(request.getQuantityMl());
+        userMedication.setTimeBetween(request.getTimeBetween());
+        userMedication.setFirstDosageTime(request.getFirstDosageTime());
+        userMedication.setMaxTakingTime(request.getMaxTakingTime());
 
-            userMedicationRepository.save(userMedication);
-            return userMedication;
-    }
-
-    public boolean deleteUserMedication(UUID userId, UUID medicationId) {
-        Optional<UserMedication> userMedication = userMedicationRepository.findByUserIdAndMedicationId(userId, medicationId);
-        if (userMedication.isPresent()) {
-            userMedicationRepository.delete(userMedication.get());
-            return true;
-        }
-        return false;
+        userMedicationRepository.save(userMedication);
+        return userMedication;
     }
 }
