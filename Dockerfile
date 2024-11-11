@@ -1,6 +1,5 @@
-FROM openjdk:17-jdk-slim
-
-RUN apt-get update && apt-get install -y maven
+# Etapa 1: Build da aplicação
+FROM maven:3.8.5-openjdk-17 AS build
 
 WORKDIR /app
 
@@ -8,29 +7,32 @@ COPY pom.xml .
 COPY .mvn/ .mvn
 COPY mvnw .
 COPY mvnw.cmd .
-
-RUN mvn dependency:go-offline
-
 COPY src ./src
 
+# Baixar dependências e compilar o projeto, ignorando testes
 RUN mvn clean package -DskipTests
 
-EXPOSE 8080
+# Etapa 2: Imagem final
+FROM openjdk:17-jdk-slim
 
-ARG SPRING_DATASOURCE_DB
-ARG SPRING_DATASOURCE_HOST
-ARG SPRING_DATASOURCE_PORT
-ARG SPRING_DATASOURCE_USERNAME
-ARG SPRING_DATASOURCE_PASSWORD
-ARG SPRING_FLYWAY_PROFILE
-ARG JWT_SECRET_KEY
+WORKDIR /app
 
+# Copia o JAR gerado na etapa de build
+COPY --from=build /app/target/ika-api-0.0.1.jar /app/ika-api.jar
+
+# Expõe a porta 443
+EXPOSE 443
+
+# Definir as variáveis de ambiente necessárias (use valores reais na execução do contêiner)
 ENV SPRING_DATASOURCE_DB=${SPRING_DATASOURCE_DB}
 ENV SPRING_DATASOURCE_HOST=${SPRING_DATASOURCE_HOST}
 ENV SPRING_DATASOURCE_PORT=${SPRING_DATASOURCE_PORT}
 ENV SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
 ENV SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
-ENV SPRING_FLYWAY_PROFILE=${SPRING_FLYWAY_PROFILE}
 ENV JWT_SECRET_KEY=${JWT_SECRET_KEY}
+ENV SERVER_SSL_KEY_STORE_PASSWORD=${SERVER_SSL_KEY_STORE_PASSWORD}
+ENV SERVER_SSL_KEY_STORE=${SERVER_SSL_KEY_STORE}
+ENV SPRING_PROFILE=${SPRING_PROFILE}
 
-CMD ["java", "-jar", "target/ika-api-0.0.1.jar"]
+# Comando para executar a aplicação
+CMD ["java", "-Dspring.profiles.active=${SPRING_PROFILE}", "-jar", "/app/ika-api.jar"]
