@@ -315,36 +315,20 @@ public class ReportService {
                 dose.put("usageTime", ""); // Inicialmente vazio, será preenchido se o medicamento foi tomado
 
                 doseTimes.add(dose);
-            }
             doseTime = doseTime.plusHours(interval);
+            }
         }
 
         return doseTimes;
     }
 
-    private boolean wasActiveAtTheTime(List<UserMedicationStatus> statuses, OffsetDateTime targetDate) {
-        // Ordena a lista para garantir a ordem correta
-        statuses.sort((a, b) -> a.getCreatedAt().compareTo(b.getCreatedAt()));
-
-        int left = 0;
-        int right = statuses.size() - 1;
-        UserMedicationStatus result = null;
-
-        while (left <= right) {
-            int mid = (left + right) / 2;
-            OffsetDateTime midDate = statuses.get(mid).getCreatedAt();
-
-            if (!midDate.isAfter(targetDate)) {
-                result = statuses.get(mid);
-                left = mid + 1;  // Move para a direita para buscar uma data mais próxima
-            } else {
-                right = mid - 1; // Move para a esquerda
-            }
-        }
-        if (result == null) {
-            return false;
-        }
-        return result.isActive();
+    private static boolean wasActiveAtTheTime(List<UserMedicationStatus> statuses, OffsetDateTime targetDate) {
+        return statuses.stream()
+                .sorted(Comparator.comparing(UserMedicationStatus::getCreatedAt)) // Ordena antes de filtrar
+                .filter(status -> !status.getCreatedAt().isAfter(targetDate))
+                .max(Comparator.comparing(UserMedicationStatus::getCreatedAt)) // Encontra o mais próximo anterior
+                .map(UserMedicationStatus::isActive)
+                .orElse(false);
     }
 
     private OffsetDateTime getInitialDoseTime(OffsetDateTime startDate, OffsetDateTime firstDoseTime, int interval) {
