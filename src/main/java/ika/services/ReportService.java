@@ -219,9 +219,6 @@ public class ReportService {
 
             parameters.put("medicationUsageSubReport", medicationUsageSubReport);
 
-            System.out.println(supervisedUserDataList.size());
-            System.out.println(supervisedUserDataList.get(0));
-
             if (supervisedUserDataList.isEmpty() && approvalData.isEmpty()) {
                 throw new ResourceNotFoundException("No data found on responsible");
             }
@@ -264,7 +261,7 @@ public class ReportService {
 
                     if (
                             usage.getUserMedicationStockUsages().get(0).getUserMedicationStock().getUserMedication().getMedication().getId() == medicationId &&
-                            Math.abs(Duration.between(doseTime, usageTime).toMinutes()) <= maxTakingTime) {
+                                    Math.abs(Duration.between(doseTime, usageTime).toMinutes()) <= maxTakingTime) {
                         dose.put("usageTime", usageTime.format(DateTimeFormatter.ofPattern("HH:mm")));
                         isTaken = true;
                         statusVerification = usage.getIsApproved() != null ? (usage.getIsApproved() ? "Aprovado" : "Reprovado") : "Pendente";
@@ -308,18 +305,46 @@ public class ReportService {
 
         OffsetDateTime doseTime = getInitialDoseTime(startDate, firstDoseTime, (int) userMedication.getTimeBetween());
         while (doseTime.isBefore(endDate)) {
-            Map<String, Object> dose = new HashMap<>();
-            dose.put("medicationId", userMedication.getMedication().getId());
-            dose.put("medicationName", userMedication.getMedication().getName());
-            dose.put("datetime", doseTime);
-            dose.put("expectedTime", doseTime.format(DateTimeFormatter.ofPattern("dd/MM HH:mm")));
-            dose.put("usageTime", ""); // Inicialmente vazio, será preenchido se o medicamento foi tomado
+            if (wasActiveAtTheTime(userMedication.getUserMedicationStatuses(), doseTime)) {
 
-            doseTimes.add(dose);
+                Map<String, Object> dose = new HashMap<>();
+                dose.put("medicationId", userMedication.getMedication().getId());
+                dose.put("medicationName", userMedication.getMedication().getName());
+                dose.put("datetime", doseTime);
+                dose.put("expectedTime", doseTime.format(DateTimeFormatter.ofPattern("dd/MM HH:mm")));
+                dose.put("usageTime", ""); // Inicialmente vazio, será preenchido se o medicamento foi tomado
+
+                doseTimes.add(dose);
+            }
             doseTime = doseTime.plusHours(interval);
         }
 
         return doseTimes;
+    }
+
+    private boolean wasActiveAtTheTime(List<UserMedicationStatus> statuses, OffsetDateTime targetDate) {
+        // Ordena a lista para garantir a ordem correta
+        statuses.sort((a, b) -> a.getCreatedAt().compareTo(b.getCreatedAt()));
+
+        int left = 0;
+        int right = statuses.size() - 1;
+        UserMedicationStatus result = null;
+
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            OffsetDateTime midDate = statuses.get(mid).getCreatedAt();
+
+            if (!midDate.isAfter(targetDate)) {
+                result = statuses.get(mid);
+                left = mid + 1;  // Move para a direita para buscar uma data mais próxima
+            } else {
+                right = mid - 1; // Move para a esquerda
+            }
+        }
+        if (result == null) {
+            return false;
+        }
+        return result.isActive();
     }
 
     private OffsetDateTime getInitialDoseTime(OffsetDateTime startDate, OffsetDateTime firstDoseTime, int interval) {
