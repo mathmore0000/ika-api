@@ -85,6 +85,7 @@ public class NotificationService {
             notification.put("to", expoPushToken);
             notification.put("title", title);
             notification.put("body", body);
+            notification.put("sound", "default");
 
             // Envia a notificação via POST
             RestTemplate restTemplate = new RestTemplate();

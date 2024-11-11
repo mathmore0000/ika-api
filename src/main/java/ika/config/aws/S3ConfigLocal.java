@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Profile("!test") // Este Bean será ignorado durante os testes
+@Profile("local") // Este Bean será ignorado durante os testes
 public class S3ConfigLocal {
 
     @Value("${SPRING_LOCALSTACK_HOST}")

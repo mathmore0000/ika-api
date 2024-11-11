@@ -1,4 +1,4 @@
-package ika.config;
+package ika.config.flyway;
 
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-public class FlywayListenerConfig {
+public class FlywayListenerConfigLocal {
 
     @Bean
     @Profile("local")
