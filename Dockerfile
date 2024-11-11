@@ -20,7 +20,6 @@ WORKDIR /app
 # Copia o JAR gerado na etapa de build
 COPY --from=build /app/target/ika-api-0.0.1.jar /app/ika-api.jar
 
-EXPOSE 8080
 EXPOSE 443
 
 # Definir as variáveis de ambiente necessárias (use valores reais na execução do contêiner)
