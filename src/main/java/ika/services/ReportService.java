@@ -315,8 +315,8 @@ public class ReportService {
                 dose.put("usageTime", ""); // Inicialmente vazio, será preenchido se o medicamento foi tomado
 
                 doseTimes.add(dose);
-            doseTime = doseTime.plusHours(interval);
             }
+            doseTime = doseTime.plusHours(interval);
         }
 
         return doseTimes;
