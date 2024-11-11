@@ -17,7 +17,6 @@ services:
     networks:
       - ika-network
 
-
   setup-localstack:
     image: amazon/aws-cli
     container_name: setup-localstack-container
@@ -63,6 +62,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_LOCALSTACK_HOST: ${SPRING_LOCALSTACK_HOST}
+      SPRING_PROFILE: ${SPRING_PROFILE}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     ports:
       - "8080:8080"
