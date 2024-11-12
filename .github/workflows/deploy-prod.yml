@@ -1,0 +1,55 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: |
+          docker build -t ika-api:latest .
+
+      - name: Save Docker image as tar file
+        run: |
+          docker save ika-api:latest -o ika-api.tar
+
+      - name: Copy Docker image to EC2
+        env:
+          PEM_KEY: ${{ secrets.PEM_KEY }}
+        run: |
+          echo "${PEM_KEY}" > key.pem
+          chmod 600 key.pem
+          scp -i key.pem -o StrictHostKeyChecking=no ika-api.tar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}
+
+      - name: SSH into EC2 and Deploy Container
+        env:
+          PEM_KEY: ${{ secrets.PEM_KEY }}
+        run: |
+          ssh -i key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          # Parar o contêiner antigo, se estiver rodando
+          docker stop ika-api || true
+          docker rm ika-api || true
+
+          # Remover a imagem antiga
+          docker rmi ika-api:old || true
+
+          # Carregar a nova imagem
+          docker load -i /home/${{ secrets.EC2_USER }}/ika-api.tar
+
+          # Rodar o novo contêiner
+          docker run -d --name ika-api -p 8080:8080 ika-api:latest
+
+          # Limpeza
+          rm /home/${{ secrets.EC2_USER }}/ika-api.tar
+          EOF
