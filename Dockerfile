@@ -18,7 +18,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copia o JAR gerado na etapa de build
-COPY --from=build /app/target/ika-api-0.0.1.jar /app/ika-api.jar
+COPY --from=build /app/target/ika-api-1.0.0.jar /app/ika-api.jar
 
 EXPOSE 8080
 
