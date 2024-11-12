@@ -33,29 +33,19 @@ jobs:
           scp -i key.pem -o StrictHostKeyChecking=no ika-api.tar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}
 
       - name: SSH into EC2 and Deploy Container
-        env:
-          SPRING_DATASOURCE_DB: ${{ secrets.SPRING_DATASOURCE_DB }}
-          SPRING_DATASOURCE_HOST: ${{ secrets.SPRING_DATASOURCE_HOST }}
-          SPRING_DATASOURCE_PORT: ${{ secrets.SPRING_DATASOURCE_PORT }}
-          SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
-          SPRING_PROFILE: ${{ secrets.SPRING_PROFILE }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
-          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         run: |
           ssh -i key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           # Criar o arquivo .env com as variáveis necessárias
           cat <<EOT > /home/${{ secrets.EC2_USER }}/.env
-          SPRING_DATASOURCE_DB=${SPRING_DATASOURCE_DB}
-          SPRING_DATASOURCE_HOST=${SPRING_DATASOURCE_HOST}
-          SPRING_DATASOURCE_PORT=${SPRING_DATASOURCE_PORT}
-          SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
-          SPRING_PROFILE=${SPRING_PROFILE}
-          AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-          SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
-          JWT_SECRET_KEY=${JWT_SECRET_KEY}
+          SPRING_DATASOURCE_DB=${{ secrets.SPRING_DATASOURCE_DB }}
+          SPRING_DATASOURCE_HOST=${{ secrets.SPRING_DATASOURCE_HOST }}
+          SPRING_DATASOURCE_PORT=${{ secrets.SPRING_DATASOURCE_PORT }}
+          SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}
+          SPRING_PROFILE=${{ secrets.SPRING_PROFILE }}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+          JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
           EOT
 
           # Parar o contêiner antigo, se estiver rodando
