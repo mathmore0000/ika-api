@@ -39,6 +39,11 @@ public class AuthController {
     @Autowired
     private RoleService roleService;
 
+    @GetMapping("/health-check")
+    public ResponseEntity<String> authCheck(){
+        return ResponseEntity.ok("healthy!");
+    }
+
     @PostMapping("/refresh-token")
     public ResponseEntity<TokenResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
         String refreshToken = refreshTokenRequest.getRefreshToken();

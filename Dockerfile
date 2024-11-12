@@ -20,7 +20,7 @@ WORKDIR /app
 # Copia o JAR gerado na etapa de build
 COPY --from=build /app/target/ika-api-0.0.1.jar /app/ika-api.jar
 
-EXPOSE 443
+EXPOSE 8080
 
 # Definir as variáveis de ambiente necessárias (use valores reais na execução do contêiner)
 ENV SPRING_DATASOURCE_DB=${SPRING_DATASOURCE_DB}
@@ -29,9 +29,7 @@ ENV SPRING_DATASOURCE_PORT=${SPRING_DATASOURCE_PORT}
 ENV SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
 ENV SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
 ENV JWT_SECRET_KEY=${JWT_SECRET_KEY}
-ENV SERVER_SSL_KEY_STORE_PASSWORD=${SERVER_SSL_KEY_STORE_PASSWORD}
-ENV SERVER_SSL_KEY_STORE=${SERVER_SSL_KEY_STORE}
 ENV SPRING_PROFILE=${SPRING_PROFILE}
 
 # Comando para executar a aplicação
-CMD ["java", "-Dspring.profiles.active=${SPRING_PROFILE}", "-jar", "/app/ika-api.jar"]
+CMD ["java", "-jar", "/app/ika-api.jar"]
