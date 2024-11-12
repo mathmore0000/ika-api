@@ -64,4 +64,5 @@ jobs:
 
           # Limpeza
           rm /home/${{ secrets.EC2_USER }}/ika-api.tar
+          rm /home/${{ secrets.EC2_USER }}/.env
           EOF
