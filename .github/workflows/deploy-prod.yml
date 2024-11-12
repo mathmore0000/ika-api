@@ -35,6 +35,7 @@ jobs:
       - name: SSH into EC2 and Deploy Container
         run: |
           ssh -i key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+
           # Criar o arquivo .env com as variáveis necessárias
           cat <<EOT > /home/${{ secrets.EC2_USER }}/.env
           SPRING_DATASOURCE_DB=${{ secrets.SPRING_DATASOURCE_DB }}
