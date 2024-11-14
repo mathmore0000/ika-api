@@ -102,9 +102,9 @@ public class ReportService {
                 Map<String, Object> usageData = new HashMap<>();
                 usageData.put("medicationName", us.getUserMedicationStockUsages().get(0).getUserMedicationStock().getUserMedication().getMedication().getName());
                 usageData.put("ingestionTime", formatterDatetime.format(us.getActionTmstamp()));
-                usageData.put("userName", us.getResponsible().getDisplayName());
+                usageData.put("userName", us.getUpdatedAt() != null ? us.getResponsible().getDisplayName() : "N/A");
                 usageData.put("approvalTime", us.getUpdatedAt() != null ? formatterDatetime.format(us.getUpdatedAt()) : "N/A");
-                usageData.put("status", us.getIsApproved() ? "Aprovado" : (us.getIsApproved() == null ? "Pendente" : "Reprovado"));
+                usageData.put("status", us.getIsApproved() == null ? "Pendente" : us.getIsApproved() ? "Aprovado" : "Reprovado");
                 usageDataList.add(usageData);
             }
 

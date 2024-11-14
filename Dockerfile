@@ -17,6 +17,12 @@ FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
+# Instala as bibliotecas necessárias para o JasperReports
+RUN apt-get update && apt-get install -y \
+    libfreetype6 \
+    fontconfig \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copia o JAR gerado na etapa de build
 COPY --from=build /app/target/ika-api-1.0.0.jar /app/ika-api.jar
 
