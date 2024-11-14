@@ -30,7 +30,7 @@ public class NotificationService {
     private NotificationRepository notificationRepository;
 
     public Page<NotificationResponse> getNotifications(UUID userId, Pageable pageable) {
-        return notificationRepository.findByUserIdOrderByCreatedAtAsc(userId, pageable).map(this::convertToNotificationWithNotificationResponse);
+        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable).map(this::convertToNotificationWithNotificationResponse);
     }
 
     @Transactional
